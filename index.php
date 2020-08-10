@@ -12,6 +12,7 @@ if(!isset($_GET["password"]) || $_GET["password"] !== $password) die();
 	<link rel="icon" type="image/png" href="styles/img/favicon.png">
     <script src="styles/jquery-2.1.4.min.js"></script> 
     <script src="styles/bootstrap.min.js"></script>
+    <script src="scripts/loadstat.js"></script>
     <title>ReMask Panel</title>
   </head>
   <body class="text-center">
@@ -62,13 +63,13 @@ if(!isset($_GET["password"]) || $_GET["password"] !== $password) die();
 	  </form>
   </div>
   <table class="table table-dark table-hover" style="font-size: 16px;">
-    <tbody id="table"></tbody>
+    <tbody id="statBody"></tbody>
   </table>
   <div id='message'></div>
   <a href="https://vk.com/tron_cpa">©ТРОН</a> | <a href="https://teleg.run/adamusfb">Scripts by Adam</a> | <a href="https://vk.com/bearded_cpa">Бородатый арбитраж</a> | <a href="https://vk.com/yellowweb">Жёлтый Веб</a>
   <script type="text/javascript">
     function clearTable(){
-		var statBody=document.getElementById("table");
+		var statBody=document.getElementById("statBody");
 		var list = statBody.getElementsByTagName("tr");
 		if (list.length==0) return;
 		for (var k = list.length - 1; k <= 0; k--) {
@@ -78,10 +79,8 @@ if(!isset($_GET["password"]) || $_GET["password"] !== $password) die();
 	}
 
     function load_data(){
-		clearTable();  
-		var s = document.createElement("script");
-		s.src = "scripts/loadstat.js";
-		document.head.appendChild(s);
+        clearTable();  
+        loadAllStatistics();
 	}
   </script>
   </body>

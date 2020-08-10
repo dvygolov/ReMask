@@ -139,7 +139,7 @@ switch ($action){
 		}
 		$adrules = ReadAdrules($aid,$token);
 		$str = ArrToStr($adrules,true);
-		echo '<div align="center"><form method="post"><textarea rows="20" cols="150" class="form-control" name="data">'.$str.'</textarea><br><input name="name" class="form-control" placeholder="Имя пресета"><input type="submit" class="btn btn-primary" value="Сохранить в пресет"></form><br><br><input type="button" class="btn btn-danger" value="Назад" onclick="window.history.back();"></div>';
+		echo '<div align="center"><form method="post"><textarea rows="20" cols="150" class="form-control" name="data">'.$str.'</textarea><br><input name="name" class="form-control" placeholder="Имя шаблона"><input type="submit" class="btn btn-primary" value="Сохранить шаблон"></form><br><br><input type="button" class="btn btn-danger" value="Назад" onclick="window.history.back();"></div>';
 		exit;		
 		break;
 	}

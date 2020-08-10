@@ -13,6 +13,14 @@ if (isset($_POST["name"]) && isset($_POST["token"])){
 	fclose($accFile);
 }
 
+if (isset($_GET["act"]) && $_GET["act"]=="delete" && isset($_GET["line"])){
+    $line=$_GET["line"];
+    $array = file($fileName, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    unset($array[$line-1]);	
+    $text = implode("\n",$array)."\n";
+    file_put_contents($fileName,$text);
+}
+
 if(!isset($_GET["password"]) || $_GET["password"] !== $password) die();
 ?>
 <!DOCTYPE html>
@@ -56,7 +64,8 @@ if(!isset($_GET["password"]) || $_GET["password"] !== $password) die();
 				else
 					$tableOutput.="<TD class='accclmn'>".$field."</TD>"; //Add all other columns
 				$i++;
-			}
+            }
+            $tableOutput.="<TD><a href='tokens.php?act=delete&line=".$countLines."&password=".$_GET["password"]."'>[Delete]</a></TD>";
 			$tableOutput.="</TR>";
 		}
 		$tableOutput.="</tbody></TABLE>";
@@ -73,7 +82,7 @@ if(!isset($_GET["password"]) || $_GET["password"] !== $password) die();
 	<b style="color:#c8ccd6">Добавление аккаунта</b>
 	<br/>
 	<br/>
-	<form name="add" method="post" onsubmit="return validate_form ()">
+	<form name="add" method="post" action="tokens.php?password=<?=$_GET['password'];?>" onsubmit="return validate_form ()">
 	  <input name="name" type="text" class="form-control" value="" placeholder="Имя" /> 
 	  <input name="token" type="text" class="form-control" value="" placeholder="Токен" /> 
 	  <input type="submit" name='additem' class="btn btn-primary" value="Добавить" />
