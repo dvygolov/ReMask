@@ -1,0 +1,4 @@
+<FilesMatch "(accounts\.csv|base\.txt)">
+Order allow,deny
+Deny from all
+</FilesMatch>
