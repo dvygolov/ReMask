@@ -5,7 +5,7 @@ if(!isset($_GET["password"]) || $_GET["password"] !== $password) die();
 ?>
 <html>
 <head>
-    <meta charset="utf8">
+    <meta charset="utf-8">
     <link rel="stylesheet" href="styles/bootstrap.min.css">
     <link href="styles/signin.css" rel="stylesheet">
 	<link rel="icon" type="image/png" href="styles/img/favicon.png">
@@ -18,9 +18,9 @@ if(!isset($_GET["password"]) || $_GET["password"] !== $password) die();
 	  <a href="index.php?password=<?=$_GET["password"];?>">Статистика</a> |
 	  <a href="rules.php?password=<?=$_GET["password"];?>">Автоправила</a>
 	</h2>
-<?
+<?php
 
-$action = $_GET["act"];
+$action = isset($_REQUEST["act"])?$_REQUEST["act"]:'';
 switch ($action){
 	case "add":
 	{
@@ -59,7 +59,7 @@ switch ($action){
 		$numstroki = $_GET["line"];
 		$token = $_GET["token"];
 		$nname = $_GET["nname"];
-		$url = "https://graph.facebook.com/v6.0/me/adaccounts?fields=business{name},name,account_id,created_time,adrules_library&access_token=".$token;
+		$url = "https://graph.facebook.com/v11.0/me/adaccounts?fields=business{name},name,account_id,created_time,adrules_library&access_token=".$token;
 		$parametrs = array(
 			'http' => array(
 			'ignore_errors' => true,
@@ -169,7 +169,7 @@ switch ($action){
 			$array[$i]["id"] = explode("|",$_POST["check"][$i])[0];
 			$array[$i]["token"] = explode("|",$_POST["check"][$i])[1];
 		}
-		$data = file_get_contents("./presets/".$filename);
+		$data = file_get_contents(__DIR__."/presets/".$filename);
 		for($j=0;$j<count($array);$j++){
 			$rules = StrToArr($data, true);
 			for($i=0;$i<count($rules);$i++){
@@ -192,7 +192,7 @@ switch ($action){
 	}
 	default:
 	{
-		$base = file_get_contents($baseFileName);
+		$base = file_get_contents(__DIR__.'/'.$baseFileName);
 		$base = explode("\r\n",$base);
 		$data = "";
 		$i2=0;
@@ -270,7 +270,7 @@ switch ($action){
 		<b style="color:#c8ccd6">Шаблоны</b> 
 		<br/>
 		<select name='preset' class='form-control' size='8'style='width:900;' required>
-		<?
+		<?php
 		$dir = __DIR__.'/presets';
 		$files = scandir($dir);
 		for($i=0;$i<count($files);$i++){

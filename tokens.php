@@ -26,7 +26,7 @@ if(!isset($_GET["password"]) || $_GET["password"] !== $password) die();
 <!DOCTYPE html>
 <html lang="en">
   <head class="text-center">
-    <meta charset="utf8" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=2, shrink-to-fit=no" />
     <link href="styles/bootstrap.min.css" rel="stylesheet" />
     <link href="styles/signin.css" rel="stylesheet" />
@@ -43,7 +43,7 @@ if(!isset($_GET["password"]) || $_GET["password"] !== $password) die();
 	</h2>
 	<br/>
 	
-	<?
+    <?php
 	//Load all account tokens from file
 	if(file_exists($fileName)){     
    		$fileLines = file($fileName, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);

@@ -1,4 +1,5 @@
-<?
+<?php
+
 function Redirect($url){
 	echo "<script type='text/javascript'> window.location='$url';</script>";
 	return;
@@ -6,7 +7,7 @@ function Redirect($url){
 
 function AddAcc($token,$nname){
 	if(($token!="")&&($token!="null")){
-		$url = "https://graph.facebook.com/v6.0/me/adaccounts?fields=business{name},name,account_id,created_time,adrules_library&access_token=".$token;
+		$url = "https://graph.facebook.com/v11.0/me/adaccounts?fields=business{name},name,account_id,created_time,adrules_library&access_token=".$token;
 		$parametrs = array(
 			'http' => array(
 			'ignore_errors' => true,
@@ -26,7 +27,7 @@ function AddAcc($token,$nname){
 			if(!isset($json["data"][$i]["business"])){
 				$temparr["name"] = $json["data"][$i]["name"];
 				$temparr["id"] = $json["data"][$i]["account_id"];
-				$temparr["countadr"] = count($json["data"][$i]["adrules_library"]["data"]);
+				$temparr["countadr"] = isset($json["data"][$i]["adrules_library"])?count($json["data"][$i]["adrules_library"]["data"]):0;
 				$temp = $json["data"][$i]["created_time"];
 				$temp = str_replace("T"," ",$temp);
 				$temp = substr($temp, 0, -5);
@@ -68,12 +69,12 @@ function AddAcc($token,$nname){
 		$text = json_encode($line);
 		$text = base64_encode($text);
 		$text.= "\r\n";
-		file_put_contents("base.txt",$text, FILE_APPEND | LOCK_EX);
+		file_put_contents(__DIR__."/base.txt",$text, FILE_APPEND | LOCK_EX);
 	}
 }
 
 function ReadAdrules($aid,$token){
-	$url_read = "https://graph.facebook.com/v5.0/me/adaccounts?fields=adrules_library{id,account_id,created_by,created_time,evaluation_spec,execution_spec,name,schedule_spec,status,updated_time}&locale=ru_RU&access_token=".$token;
+	$url_read = "https://graph.facebook.com/v11.0/me/adaccounts?fields=adrules_library{id,account_id,created_by,created_time,evaluation_spec,execution_spec,name,schedule_spec,status,updated_time}&locale=ru_RU&access_token=".$token;
 	//die($url_read);
 	$response = file_get_contents($url_read);
 	$json = json_decode($response,true);
@@ -93,7 +94,7 @@ function ReadAdrules($aid,$token){
 	return $data;
 }
 function WriteAdrules($rule,$token,$id){
-	$url_write = "https://graph.facebook.com/v6.0/act_".$id."/adrules_library?access_token=".$token;
+	$url_write = "https://graph.facebook.com/v11.0/act_".$id."/adrules_library?access_token=".$token;
 	$params = array(
 		'account_id' => $id,
 		'evaluation_spec' => $rule[0],

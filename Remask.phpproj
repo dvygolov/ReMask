@@ -1,0 +1,57 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Name>Remask</Name>
+    <ProjectGuid>{a5693fed-4366-4d32-94c1-b2b605edf7e8}</ProjectGuid>
+    <RootNamespace>
+    </RootNamespace>
+    <OutputType>Library</OutputType>
+    <ProjectTypeGuids>{A0786B88-2ADB-4C21-ABE8-AA2D79766269}</ProjectTypeGuids>
+    <ProjectHome />
+    <Runtime>PHP</Runtime>
+    <RuntimeVersion>7.2</RuntimeVersion>
+    <EnvName>PHPDev</EnvName>
+    <PHPDevHostName>localhost</PHPDevHostName>
+    <PHPDevAutoPort>true</PHPDevAutoPort>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <IncludeDebugInformation>true</IncludeDebugInformation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <IncludeDebugInformation>false</IncludeDebugInformation>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include=".vs\slnx.sqlite" />
+    <Compile Include=".vscode\iisexpress.json" />
+    <Compile Include=".vscode\launch.json" />
+    <Compile Include="fbstats.php" />
+    <Compile Include="presets\Results more 5%24 Spend more 5%24" />
+    <Compile Include="scripts\js.js" />
+    <Compile Include="scripts\loadstat.js" />
+    <Compile Include="styles\img\background.jpg" />
+    <Compile Include="styles\img\favicon.png" />
+    <Compile Include="styles\bootstrap.min.css" />
+    <Compile Include="styles\bootstrap.min.js" />
+    <Compile Include="styles\jquery-2.1.4.min.js" />
+    <Compile Include="styles\signin.css" />
+    <Compile Include=".gitignore" />
+    <Compile Include=".htaccess" />
+    <Compile Include="accounts.csv" />
+    <Compile Include="base.txt" />
+    <Compile Include="functions.php" />
+    <Compile Include="index.php" />
+    <Compile Include="README.md" />
+    <Compile Include="rules.php" />
+    <Compile Include="settings.php" />
+    <Compile Include="tokens.php" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include=".vs" />
+    <Folder Include=".vscode" />
+    <Folder Include="presets" />
+    <Folder Include="Properties\" />
+    <Folder Include="scripts" />
+    <Folder Include="styles\img" />
+    <Folder Include="styles" />
+  </ItemGroup>
+</Project>
