@@ -7,8 +7,11 @@ include 'settings.php';
 if (isset($_POST["name"]) && isset($_POST["token"])){
 	$name= $_POST["name"];
 	$token=$_POST["token"];
+	$proxy='';
+	if (isset($_POST['proxy']))
+		$proxy=$_POST['proxy'];
 	$accFile = fopen($fileName, 'a+');
-	fwrite($accFile, "$name, $token\n");
+	fwrite($accFile, "$name, $token, $proxy\n");
 	fflush($accFile);
 	fclose($accFile);
 }
@@ -21,7 +24,7 @@ if (isset($_GET["act"]) && $_GET["act"]=="delete" && isset($_GET["line"])){
     file_put_contents($fileName,$text);
 }
 
-if(!isset($_GET["password"]) || $_GET["password"] !== $password) die();
+if(!isset($_GET["password"]) || $_GET["password"] !== $password) die("No password or wrong password!");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -85,6 +88,7 @@ if(!isset($_GET["password"]) || $_GET["password"] !== $password) die();
 	<form name="add" method="post" action="tokens.php?password=<?=$_GET['password'];?>" onsubmit="return validate_form ()">
 	  <input name="name" type="text" class="form-control" value="" placeholder="Имя" /> 
 	  <input name="token" type="text" class="form-control" value="" placeholder="Токен" /> 
+	  <input name="proxy" type="text" class="form-control" value="" placeholder="Прокси ip:port:login:pass" /> 
 	  <input type="submit" name='additem' class="btn btn-primary" value="Добавить" />
 	</form>
 	<br/>

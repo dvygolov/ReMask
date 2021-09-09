@@ -37,7 +37,10 @@ if(!isset($_GET["password"]) || $_GET["password"] !== $password) die();
 		foreach ($fileLines as $line) {
 			if(trim($line) === '') continue;
 			$arrayFields = array_map('trim', str_getcsv($line, $delimiter, $enclosure)); //Convert line to array
-			printf("<option value='%s'>%s</option>",$arrayFields[1],$arrayFields[0]);
+			$value=$arrayFields[1];
+			if (count($arrayFields)>2)
+				$value.='|'.$arrayFields[2];
+			printf("<option value='%s'>%s</option>",$value,$arrayFields[0]);
 		}
 	}
 	?>
