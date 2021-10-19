@@ -19,5 +19,7 @@
     $info = curl_getinfo($curl);
     $error= curl_error($curl);
     curl_close($curl);
+    if ($info['http_code']!==200)
+        http_response_code($info['http_code']);
     echo $html;
 ?>

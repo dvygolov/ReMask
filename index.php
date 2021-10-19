@@ -1,6 +1,6 @@
 <?php 
 include 'settings.php';
-if(!isset($_GET["password"]) || $_GET["password"] !== $password) die(); 
+if(!isset($_GET["password"]) || $_GET["password"] !== $password) die("No password given!"); 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,7 +13,7 @@ if(!isset($_GET["password"]) || $_GET["password"] !== $password) die();
     <script src="styles/jquery-2.1.4.min.js"></script> 
     <script src="styles/bootstrap.min.js"></script>
     <script src="scripts/loadstat.js"></script>
-    <title>ReMask Panel</title>
+    <title>ReMask Panel ver: 0.1a</title>
   </head>
   <body class="text-center">
   <div class="form-group">
@@ -69,7 +69,7 @@ if(!isset($_GET["password"]) || $_GET["password"] !== $password) die();
     <tbody id="statBody"></tbody>
   </table>
   <div id='message'></div>
-  <a href="https://vk.com/tron_cpa">©ТРОН</a> | <a href="https://teleg.run/adamusfb">Scripts by Adam</a> | <a href="https://vk.com/bearded_cpa">Бородатый арбитраж</a> | <a href="https://vk.com/yellowweb">Жёлтый Веб</a>
+  <a href="https://vk.com/tron_cpa">©ТРОН</a> | <a href="https://t.me/adamusfb">Scripts by Adam</a> | <a href="https://vk.com/bearded_cpa">Бородатый арбитраж</a> | <a href="https://t.me/yellow_web">Жёлтый Веб</a>
   <script type="text/javascript">
     function clearTable(){
 		var statBody=document.getElementById("statBody");

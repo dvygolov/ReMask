@@ -1,4 +1,4 @@
-var datetime,token,show,parent;
+var datetime, token, show, parent;
 var allTResult = 0;
 var allTSpent = 0;
 var allTCPL = [];
@@ -60,13 +60,13 @@ function load(arr) {
     };
 
     var xhr = new XMLHttpRequest();
-    var url = 'fbstats.php?fields=adspixels,promote_pages{access_token,id},insights.date_preset(' + datetime + '),ads.date_preset(' + datetime + ').time_increment(' + datetime + ').limit(500){insights.limit(500).date_preset(' + datetime + '){results,relevance_score,inline_link_click_ctr,inline_link_clicks,ctr,cpc,cpm},creative{effective_object_story_id,effective_instagram_story_id,actor_id},adlabels,created_time,recommendations,updated_time,ad_review_feedback,bid_info,configured_status,delivery_info,status,effective_status,adcreatives.limit(500){place_page_set_id,object_story_spec{instagram_actor_id,link_data{link},page_id},image_crops,image_url,status,thumbnail_url},result,cost_per_lead_fb,name,clicks,spent,cost_per,reach,link_ctr,impressions},date{' + datetime + '},funding_source_details,business{name,link},adrules_library{name},current_unbilled_spend,adspaymentcycle,spend_cap,amount_spent,age,disable_reason,account_status,balance,all_payment_methods{pm_credit_card{account_id,credential_id,display_string,exp_month,exp_year}},currency,timezone_name,created_time,name,status,adtrust_dsl&locale=ru_RU&access_token=' + access_token;
+    var url = 'fbstats.php?fields=adspixels,promote_pages{access_token,id},insights.date_preset(' + datetime + '),ads.date_preset(' + datetime + ').time_increment(' + datetime + ').limit(500){insights.limit(500).date_preset(' + datetime + '){results,inline_link_click_ctr,inline_link_clicks,ctr,cpc,cpm},creative{effective_object_story_id,effective_instagram_story_id,actor_id},adlabels,created_time,recommendations,updated_time,ad_review_feedback,bid_info,configured_status,delivery_info,status,effective_status,adcreatives.limit(500){place_page_set_id,object_story_spec{instagram_actor_id,link_data{link},page_id},image_crops,image_url,status,thumbnail_url},result,cost_per_lead_fb,name,clicks,spent,cost_per,reach,link_ctr,impressions},date{' + datetime + '},funding_source_details,business{name,link},adrules_library{name},current_unbilled_spend,adspaymentcycle,spend_cap,amount_spent,age,disable_reason,account_status,balance,all_payment_methods{pm_credit_card{account_id,credential_id,display_string,exp_month,exp_year}},currency,timezone_name,created_time,name,status,adtrust_dsl&locale=ru_RU&access_token=' + access_token;
     if (proxy != '')
         url += '&proxy=' + proxy;
-    xhr.open("GET",url, true);
+    xhr.open("GET", url, true);
 
     xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
+        if (xhr.readyState == 4) {
             if (xhr.status == 400) {
                 var json = JSON.parse(xhr.responseText);
 
@@ -74,9 +74,6 @@ function load(arr) {
                     alert(json.error.message);
                 } else console.log("%c%s%c: %c%s", "color: blue", acc_name, "background: inherit;", "font-weight: bold; color: red; font-style: italic;", json.error.message)
             }
-        }
-
-        if (xhr.readyState == 4) {
             var accounts = JSON.parse(xhr.responseText);
             for (var account in accounts['data']) {
 

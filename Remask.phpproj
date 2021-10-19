@@ -10,9 +10,10 @@
     <ProjectHome />
     <Runtime>PHP</Runtime>
     <RuntimeVersion>7.2</RuntimeVersion>
-    <EnvName>PHPDev</EnvName>
+    <EnvName>IISExpress</EnvName>
     <PHPDevHostName>localhost</PHPDevHostName>
     <PHPDevAutoPort>true</PHPDevAutoPort>
+    <SaveServerSettingsInUserFile>false</SaveServerSettingsInUserFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <IncludeDebugInformation>true</IncludeDebugInformation>
