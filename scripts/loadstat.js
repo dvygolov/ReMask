@@ -87,9 +87,11 @@ function load(arr) {
                 var billing = "";
                 var card = "";
                 if (accounts.data[account]['ads']) {
-                    if (accounts.data[account]['adspaymentcycle']['data'][0]['threshold_amount']) {
-                        bill = parseFloat(accounts.data[account]['adspaymentcycle']['data'][0]['threshold_amount']);
-                        billing = '/' + mathMoney(bill).toString();
+                    if (accounts.data[account]['adspaymentcycle'] !== undefined) {
+                        if (accounts.data[account]['adspaymentcycle']['data'][0]['threshold_amount']) {
+                            bill = parseFloat(accounts.data[account]['adspaymentcycle']['data'][0]['threshold_amount']);
+                            billing = '/' + mathMoney(bill).toString();
+                        }
                     }
 
                     if (accounts.data[account]['current_unbilled_spend']['amount'])

@@ -13,7 +13,7 @@ if(!isset($_GET["password"]) || $_GET["password"] !== $password) die("No passwor
     <script src="styles/jquery-2.1.4.min.js"></script> 
     <script src="styles/bootstrap.min.js"></script>
     <script src="scripts/loadstat.js"></script>
-    <title>ReMask Panel ver: 0.1a</title>
+    <title>ReMask Panel ver: 0.1b</title>
   </head>
   <body class="text-center">
   <div class="form-group">
