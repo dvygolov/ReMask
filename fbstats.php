@@ -3,7 +3,7 @@
     $get=$_GET;
     unset($get["proxy"]);
     $optArray = array(
-            CURLOPT_URL => "https://graph.facebook.com/v11.0/me/adaccounts?".http_build_query($get),
+            CURLOPT_URL => "https://graph.facebook.com/v16.0/me/adaccounts?".http_build_query($get),
             CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_SSL_VERIFYPEER => false
 			);
@@ -22,4 +22,3 @@
     if ($info['http_code']!==200)
         http_response_code($info['http_code']);
     echo $html;
-?>

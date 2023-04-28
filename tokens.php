@@ -4,14 +4,15 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 include 'settings.php';
 
-if (isset($_POST["name"]) && isset($_POST["token"])){
+if (isset($_POST["name"]) && isset($_POST["token"]) && isset($_POST["cookies"])){
 	$name= $_POST["name"];
 	$token=$_POST["token"];
+    $cookies = $_POST["cookies"];
 	$proxy='';
 	if (isset($_POST['proxy']))
 		$proxy=$_POST['proxy'];
 	$accFile = fopen($fileName, 'a+');
-	fwrite($accFile, "$name, $token, $proxy\n");
+	fwrite($accFile, "$name, $token, $cookies, $proxy\n");
 	fflush($accFile);
 	fclose($accFile);
 }
@@ -36,14 +37,10 @@ if(!isset($_GET["password"]) || $_GET["password"] !== $password) die("No passwor
 	<link rel="icon" type="image/png" href="styles/img/favicon.png">
     <script src="styles/jquery-2.1.4.min.js"></script> 
     <script src="styles/bootstrap.min.js"></script>
-    <title>ReMask Panel</title>
+    <title><?=include 'version.php'?></title>
   </head>
   <body class="text-center">
-  	<h2>	
-	  <a href="tokens.php?password=<?=$_GET["password"];?>">Токены</a> |
-	  <a href="index.php?password=<?=$_GET["password"];?>">Статистика</a> |
-	  <a href="rules.php?password=<?=$_GET["password"];?>">Автоправила</a>
-	</h2>
+    <?= include 'menu.php'?>
 	<br/>
 	
     <?php
@@ -82,22 +79,26 @@ if(!isset($_GET["password"]) || $_GET["password"] !== $password) die("No passwor
 	?>
 	<br/>
 	<br/>
-	<b style="color:#c8ccd6">Добавление аккаунта</b>
+	<b style="color:#c8ccd6">Add Account</b>
 	<br/>
 	<br/>
-	<form name="add" method="post" action="tokens.php?password=<?=$_GET['password'];?>" onsubmit="return validate_form ()">
-	  <input name="name" type="text" class="form-control" value="" placeholder="Имя" /> 
-	  <input name="token" type="text" class="form-control" value="" placeholder="Токен" /> 
-	  <input name="proxy" type="text" class="form-control" value="" placeholder="Прокси ip:port:login:pass" /> 
-	  <input type="submit" name='additem' class="btn btn-primary" value="Добавить" />
+	<form name="add" method="post" action="tokens.php?password=<?=$_GET['password'];?>" onsubmit="return validate_form();">
+	  <input name="name" type="text" class="form-control" value="" placeholder="Name" />
+	  <input name="token" type="text" class="form-control" value="" placeholder="Token" />
+      <input name="cookies" type="text" class="form-control" value="" placeholder="JSON-cookies" />
+	  <input name="proxy" type="text" class="form-control" value="" placeholder="Proxy ip:port:login:pass" />
+	  <input type="submit" name="additem" class="btn btn-primary" value="Add!" />
 	</form>
 	<br/>
-    <a href="https://vk.com/tron_cpa">©ТРОН</a> | <a href="https://teleg.run/adamusfb">Scripts by Adam</a> | <a href="https://vk.com/bearded_cpa">Бородатый арбитраж</a> | <a href="https://vk.com/yellowweb">Жёлтый Веб</a>
+    <?= include 'copyright.php'?>
 	<script>
 	function validate_form (){
-		valid = true;
-		if (document.add.name.value == "" || document.add.token.value == ""){
-			alert("Нужно заполнить все поля!");
+		let valid = true;
+		if (document.add.name.value == "" ||
+            document.add.token.value == "" ||
+            document.add.cookies.value == ""
+        ){
+			alert("You need to fill ALL fields!");
 			valid = false;
 		}
 		return valid;

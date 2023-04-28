@@ -119,12 +119,6 @@ function load(arr) {
                 if ('adspixels' in accounts.data[account])
                     pixelid = accounts.data[account]['adspixels']['data'][0]['id'];
 
-                //"date_start": "2020-04-24",
-                //  "date_stop": "2020-04-29",
-                ///  "impressions": "189",
-                // "spend": "59.93"
-
-                //insights
                 var rkid = '';
                 var rkstart = '';
                 var rkstop = '';

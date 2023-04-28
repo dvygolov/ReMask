@@ -1,0 +1,1 @@
+<a href="https://t.me/tron_cpa">©ТРОН</a> | <a href="https://t.me/adamusfb">Scripts by Adam</a> | <a href="https://t.me/bearded_cpa">Бородатый арбитраж</a> | <a href="https://t.me/yellow_web">Жёлтый Веб</a>

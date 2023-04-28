@@ -7,7 +7,7 @@ function Redirect($url){
 
 function AddAcc($token,$nname){
 	if(($token!="")&&($token!="null")){
-		$url = "https://graph.facebook.com/v11.0/me/adaccounts?fields=business{name},name,account_id,created_time,adrules_library&access_token=".$token;
+		$url = "https://graph.facebook.com/v16.0/me/adaccounts?fields=business{name},name,account_id,created_time,adrules_library&access_token=".$token;
 		$parametrs = array(
 			'http' => array(
 			'ignore_errors' => true,
@@ -74,8 +74,7 @@ function AddAcc($token,$nname){
 }
 
 function ReadAdrules($aid,$token){
-	$url_read = "https://graph.facebook.com/v11.0/me/adaccounts?fields=adrules_library{id,account_id,created_by,created_time,evaluation_spec,execution_spec,name,schedule_spec,status,updated_time}&locale=ru_RU&access_token=".$token;
-	//die($url_read);
+	$url_read = "https://graph.facebook.com/v16.0/me/adaccounts?fields=adrules_library{id,account_id,created_by,created_time,evaluation_spec,execution_spec,name,schedule_spec,status,updated_time}&locale=ru_RU&access_token=".$token;
 	$response = file_get_contents($url_read);
 	$json = json_decode($response,true);
 	$num = 0;
@@ -121,8 +120,7 @@ function ArrToStr($array, $encode = false){
 		$result.= "#@#@#";
 	}
 	$result = substr($result, 0, -5);
-	if($encode==true) $result = base64_encode($result);
-	return $result;
+    return base64_encode($result);
 }
 function StrToArr($str, $encode = false){
 	if($encode==true) $str = base64_decode ($str);

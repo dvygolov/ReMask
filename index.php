@@ -13,15 +13,11 @@ if(!isset($_GET["password"]) || $_GET["password"] !== $password) die("No passwor
     <script src="styles/jquery-2.1.4.min.js"></script> 
     <script src="styles/bootstrap.min.js"></script>
     <script src="scripts/loadstat.js"></script>
-    <title>ReMask Panel ver: 0.1b</title>
+    <title><?=include 'version.php'?></title>
   </head>
   <body class="text-center">
   <div class="form-group">
-	<h2>	
-	  <a href="tokens.php?password=<?=$_GET["password"];?>">Токены</a> |
-	  <a href="index.php?password=<?=$_GET["password"];?>">Статистика</a> |
-	  <a href="rules.php?password=<?=$_GET["password"];?>">Автоправила</a>
-	</h2>
+      <?= include 'menu.php'?>
 	<br/>
 	<b style="color:#c8ccd6">Загрузка статистики</b> 
 	<br/>
