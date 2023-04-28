@@ -16,3 +16,7 @@
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode
 /.vs
 /Remask.phpproj.user
+/.idea/modules.xml
+/.idea/ReMask.iml
+/.idea/vcs.xml
+/.idea/.gitignore
