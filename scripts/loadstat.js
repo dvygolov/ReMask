@@ -1,10 +1,29 @@
+const disable_reasons = [
+    '',
+    'ADS_INTEGRITY_POLICY',
+    'ADS_IP_REVIEW',
+    'RISK_PAYMENT',
+    'GRAY_ACCOUNT_SHUT_DOWN',
+    'ADS_AFC_REVIEW',
+    'BUSINESS_INTEGRITY_RAR',
+    'PERMANENT_CLOSE',
+    'UNUSED_RESELLER_ACCOUNTR'
+];
+
+const account_statuses = {
+    1: 'ACTIVE',
+    2: 'DISABLED',
+    3: 'UNSETTLED',
+    7: 'PENDING_RISK_REVIEW',
+    8: 'PENDING_SETTLEMENT',
+    9: 'IN_GRACE_PERIOD',
+    100: 'PENDING_CLOSURE',
+    101: 'CLOSED',
+    201: 'ANY_ACTIVE',
+    202: 'ANY_CLOSED'
+};
+
 var show, parent;
-var allTResult = 0;
-var allTSpent = 0;
-var allTCPL = [];
-var allTCPM = [];
-var allTCTR = [];
-var allTCPC = [];
 
 async function loadAllStatistics() {
     let datetime = document.getElementById('selectbox1').value;
@@ -12,29 +31,32 @@ async function loadAllStatistics() {
     show = document.getElementById('selectbox3').value; //active or all
     parent = document.getElementById('statBody');
 
-    //add thread
+    //Add table header
     let tr = document.createElement('tr');
-    tr.innerHTML = '<tr><th>Creo</th><th>Name/Link/Pixel</th><th>Status/Reason</th><th>Impressions</th><th>Clicks</th><th>Results</th><th>Spend</th><th>CPL</th><th>CPM</th><th>CTR</th><th>CPC</th></tr>';
+    const headers = [
+        'Creo', 'Name/Link/Pixel', 'Status/Reason', 'Impres.', 'Clicks', 'Results',
+        'Spend', 'CPL', 'CPM', 'CTR', 'CPC'
+    ];
+    headers.forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        tr.appendChild(th);
+    });
     parent.appendChild(tr);
 
     let selectData = [];
-    $('#selectbox2 option').each(function () {
-        selectData.push($(this).val());
-    });
+    const selectbox2 = document.getElementById('selectbox2');
+    const options = selectbox2.options;
+    for (let i = 0; i < options.length; i++) {
+        selectData.push(options[i].value);
+    }
 
-    allTResult = 0;
-    allTSpent = 0;
-    allTCPL = [];
-    allTCPM = [];
-    allTCTR = [];
-    allTCPC = [];
-
-    if (accName == 'all') {
+    if (accName === 'all') {
         for (let idx = 1; idx < selectData.length; idx++) {
             await load(selectData[idx], datetime);
         }
     } else {
-        await load($('#selectbox2').find(":selected").val(),datetime);
+        await load(selectbox2.options[selectbox2.selectedIndex].value, datetime);
     }
 }
 
@@ -63,240 +85,241 @@ async function fetchData(accName, datetime) {
 
 // Example usage
 async function load(accName, datetime) {
-    let disable_reasons = [
-        '',
-        'ADS_INTEGRITY_POLICY',
-        'ADS_IP_REVIEW',
-        'RISK_PAYMENT',
-        'GRAY_ACCOUNT_SHUT_DOWN',
-        'ADS_AFC_REVIEW',
-        'BUSINESS_INTEGRITY_RAR',
-        'PERMANENT_CLOSE',
-        'UNUSED_RESELLER_ACCOUNTR'
-    ];
-    let account_statuses = {
-        1: 'ACTIVE',
-        2: 'DISABLED',
-        3: 'UNSETTLED',
-        7: 'PENDING_RISK_REVIEW',
-        8: 'PENDING_SETTLEMENT',
-        9: 'IN_GRACE_PERIOD',
-        100: 'PENDING_CLOSURE',
-        101: 'CLOSED',
-        201: 'ANY_ACTIVE',
-        202: 'ANY_CLOSED'
-    };
+    var accounts = await fetchData(accName, datetime);
+    for (const account in accounts.data) {
+        const adAccount = accounts.data[account];
+        const accountRow = createAccountRow(adAccount, show, accName);
+        parent.appendChild(accountRow);
 
-    let accounts = await fetchData(accName, datetime);
-    for (let account in accounts['data']) {
+        const id = adAccount['id'];
+        const totalStats = {
+            tImpressions: 0,
+            tClicks: 0,
+            tResult: 0,
+            tSpent: 0,
+            tCPL: [],
+            tCPM: [],
+            tCTR: [],
+            tCPC: [],
+        };
 
-        let username = accounts.data[account]['name'];
-        let account_status = accounts.data[account]['account_status'];
-        let disable_reason = accounts.data[account]['disable_reason'];
-        let adtrust_dsl = accounts.data[account]['adtrust_dsl'];
-        let currency = accounts.data[account]['currency'];
-        let id = accounts.data[account]['id'];
-        let bill, currunbilled = "";
-        let billing = "";
-        let card = "";
-        if (accounts.data[account]['ads']) {
-            if (accounts.data[account]['adspaymentcycle'] !== undefined) {
-                if (accounts.data[account]['adspaymentcycle']['data'][0]['threshold_amount']) {
-                    bill = parseFloat(accounts.data[account]['adspaymentcycle']['data'][0]['threshold_amount']);
-                    billing = '/' + mathMoney(bill).toString();
-                }
-            }
+        if (!adAccount.ads) continue;
 
-            if (accounts.data[account]['current_unbilled_spend']['amount'])
-                currunbilled = '/' + accounts.data[account]['current_unbilled_spend']['amount'];
-
-            if ('funding_source_details' in accounts.data[account])
-                if ('display_string' in accounts.data[account]['funding_source_details'])
-                    card = ' (' + accounts.data[account]['funding_source_details']['display_string'] + ' ' + currency + ')';
-        }
-        //colors
-        let ascolor = 'red';
-        if (account_status === 1 | account_status == 'ACTIVE') ascolor = 'Lime';
-
-        let dscolor = 'red';
-        if (disable_reason === 0) dscolor = 'Lime';
-
-        //add thead of ad account
-        let sep = '';
-        if (disable_reason !== 0) sep = ' - ';
-
-        let aname = "";
-        if (accName !== "") aname = accName + ": ";
-
-        let pixelid = '';
-        if ('adspixels' in accounts.data[account])
-            pixelid = accounts.data[account]['adspixels']['data'][0]['id'];
-
-        let rkid = '';
-        let rkstart = '';
-        let rkstop = '';
-        let rkspent = '';
-        if ('insights' in accounts.data[account]) {
-            rkid = accounts.data[account]['insights']['data'][0]['account_id'];
-            rkstart = accounts.data[account]['insights']['data'][0]['date_start'];
-            rkstop = accounts.data[account]['insights']['data'][0]['date_stop'];
-            rkspent = accounts.data[account]['insights']['data'][0]['spend'];
-        }
-
-        var tr = document.createElement('tr');
-        tr.id = id;
-        tr.className = 'poster';
-        if (show === 'active') {
-            if (account_status === 1 && disable_reason === 0) {
-                tr.style = 'box-shadow: rgba(15, 17, 19, 0.63) 0px 0px 20px 2px;';
-                tr.innerHTML = '<td colspan="3"><div class="descr">Старт: ' + rkstart + ' | Стоп: ' + rkstop + '<br>Всего откручено: ' + rkspent + '<br>Айди рк: ' + rkid + '<br>Пиксель: ' + pixelid + '<br></div>' + aname + username + ' (<span style="color:' + ascolor + '">' + account_statuses[account_status] + '</span>' + sep + '<span style="color:' + dscolor + '">' + disable_reasons[disable_reason] + "</span>) - " + adtrust_dsl + billing + currunbilled + card + '</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>';
-            }
-        } else {
-            tr.style = 'box-shadow: rgba(15, 17, 19, 0.63) 0px 0px 20px 2px;';
-            tr.innerHTML = '<td colspan="3"><div class="descr">Старт: ' + rkstart + ' | Стоп: ' + rkstop + '<br>Всего откручено: ' + rkspent + '<br>Айди рк: ' + rkid + '<br>Пиксель: ' + pixelid + '<br></div>' + aname + username + ' (<span style="color:' + ascolor + '">' + account_statuses[account_status] + '</span>' + sep + '<span style="color:' + dscolor + '">' + disable_reasons[disable_reason] + "</span>) - " + adtrust_dsl + billing + currunbilled + card + '</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>';
-        }
-        parent.appendChild(tr);
-
-        let tImpressions = 0;
-        let tClicks = 0;
-        let tResult = 0;
-        let tSpent = 0;
-        let tCPL = [];
-        let tCPM = [];
-        let tCTR = [];
-        let tCPC = [];
-
-        if (accounts.data[account]['ads']) {
-            for (let ads in accounts.data[account]['ads']) {
-                let adsObj = accounts.data[account]['ads'][ads];
-                for (let adss in adsObj) {
-                    if (accounts.data[account]['ads'][ads][adss]['status']) {
-                        let acc_status = account_statuses[account_status];
-                        let dis_reason = disable_reasons[disable_reason];
-                        let effective_status = accounts.data[account]['ads'][ads][adss]['effective_status'];
-
-                        let fullimage_url = '';
-                        if (accounts.data[account]['ads'][ads][adss]['adcreatives']['data'][0]['image_url'])
-                            fullimage_url = accounts.data[account]['ads'][ads][adss]['adcreatives']['data'][0]['image_url'];
-
-                        let totable = '';
-                        let thumbnail_url = accounts.data[account]['ads'][ads][adss]['adcreatives']['data'][0]['thumbnail_url'];
-                        if (!!fullimage_url)
-                            totable = "<td><a href='" + fullimage_url + "' target='_blank'><img src=" + thumbnail_url + " width='50' height='50'></a></td>";
-                        else if (!!thumbnail_url)
-                            totable = "<td><img src='" + thumbnail_url + "' width='50' height='50'></td>";
-                        else totable = "<td><h6 style='color: red;'>Thumbnail unavailable<p>, ad is deleted</h6></td>";
-
-
-                        let link = "";
-                        if ('object_story_spec' in accounts.data[account]['ads'][ads][adss]['adcreatives']['data'][0])
-                            if ('link_data' in accounts.data[account]['ads'][ads][adss]['adcreatives']['data'][0]['object_story_spec'])
-                                link = accounts.data[account]['ads'][ads][adss]['adcreatives']['data'][0]['object_story_spec']['link_data']['link'];
-
-                        let name = accounts.data[account]['ads'][ads][adss]['name'];
-                        if (link != "") {
-                            name = "<a href='" + link + "' target='_blank'>" + name + '</a>';
-                        }
-
-                        //статистика
-                        let clicks, impressions, results, adspent, cpl, cpm, ctr, cpc;
-                        if ('impressions' in accounts.data[account]['ads'][ads][adss]) {
-                            impressions = accounts.data[account]['ads'][ads][adss]['impressions'];
-                            tImpressions += parseInt(impressions);
-                        } else impressions = 0;
-
-                        if (accounts.data[account]['ads'][ads][adss]['insights']['data'][0]['inline_link_clicks']) {
-                            clicks = parseInt(accounts.data[account]['ads'][ads][adss]['insights']['data'][0]['inline_link_clicks']);
-                            tClicks += clicks;
-                        } else clicks = 0;
-
-                        if ('result' in accounts.data[account]['ads'][ads][adss]) {
-                            results = accounts.data[account]['ads'][ads][adss]['result'];
-                            tResult += parseInt(results);
-                        } else results = 0;
-
-                        if (accounts.data[account]['ads'][ads][adss]['spent']) {
-                            adspent = mathMoney(accounts.data[account]['ads'][ads][adss]['spent']);
-                            tSpent += parseFloat(adspent);
-                        } else adspent = 0;
-
-                        if ('cost_per_lead_fb' in accounts.data[account]['ads'][ads][adss]) {
-                            cpl = mathMoney(accounts.data[account]['ads'][ads][adss]['cost_per_lead_fb']);
-                            if (cpl !== 0)
-                                tCPL.push(cpl)
-                        } else cpl = 0;
-
-                        if (accounts.data[account]['ads'][ads][adss]['insights']['data'][0]['inline_link_click_ctr']) {
-                            ctr = mathStat(accounts.data[account]['ads'][ads][adss]['insights']['data'][0]['inline_link_click_ctr']);
-                            if (ctr !== 0)
-                                tCTR.push(ctr)
-                        } else ctr = 0;
-
-                        if (accounts.data[account]['ads'][ads][adss]['insights']['data'][0]['cpm']) {
-                            cpm = mathStat(accounts.data[account]['ads'][ads][adss]['insights']['data'][0]['cpm']);
-                            if (cpm !== 0)
-                                tCPM.push(cpm)
-                        } else cpm = 0;
-
-                        if (accounts.data[account]['ads'][ads][adss]['insights']['data'][0]['cpc']) {
-                            cpc = mathStat(accounts.data[account]['ads'][ads][adss]['insights']['data'][0]['cpc']);
-                            if (cpc !== 0)
-                                tCPC.push(cpc)
-                        } else cpc = 0;
-
-                        if (adss == Object.keys(adsObj)[Object.keys(adsObj).length - 1]) {
-                            let tds = document.getElementById(id).getElementsByTagName("td");
-                            let totals = [
-                                tImpressions,
-                                tClicks,
-                                tResult,
-                                tSpent.toFixed(2),
-                                average(tCPL),
-                                average(tCPM),
-                                average(tCTR),
-                                average(tCPC)
-                            ];
-                            for (let idx = 1; idx < tds.length; idx++) {
-                                if (idx - 1 != 1 || idx - 1 != 2)
-                                    tds[idx].innerHTML = totals[idx - 1];
-                                else tds[idx].innerHTML = totals[idx - 1].toFixed(2);
-                            }
-                        }
-
-                        let escolor = 'red';
-                        if (effective_status == 'ACTIVE')
-                            escolor = 'Lime';
-                        else if (effective_status == 'ADSET_PAUSED' | effective_status == 'CAMPAIGN_PAUSED' | effective_status == 'PENDING_REVIEW')
-                            escolor = 'Gold';
-
-                        let rewiew_feedback = '';
-                        if ('ad_review_feedback' in accounts.data[account]['ads'][ads][adss]) {
-                            if ('global' in accounts.data[account]['ads'][ads][adss]['ad_review_feedback']) {
-                                for (let glo in accounts.data[account]['ads'][ads][adss]['ad_review_feedback']['global']) {
-                                    rewiew_feedback = '<br>' + glo;
-                                }
-                            }
-                        }
-
-                        let tr = document.createElement('tr');
-                        let tabble_text = '';
-                        if (show == 'active') {
-                            if (acc_status == 'ACTIVE' && dis_reason == '' && effective_status == 'ACTIVE' | effective_status == 'CAMPAIGN_PAUSED' | effective_status == 'PENDING_REVIEW') {
-                                tabble_text = totable + '<td><nobr>' + name + '</nobr></td><td><h6 style="color:' + escolor + ';">' + effective_status + rewiew_feedback + '</h6></td><td><nobr>' + impressions + '</nobr></td><td><nobr>' + clicks + '</nobr></td><td><nobr>' + results + '</nobr></td><td><nobr>' + adspent + '</nobr></td><td><nobr>' + cpl + '</nobr></td><td><nobr>' + cpm + '</nobr></td><td style="vertical-align:middle"><nobr>' + ctr + '</nobr></td></td><td><nobr>' + cpc + '</nobr></td>';
-                            }
-                        } else
-                            tabble_text = totable + '<td><nobr>' + name + '</nobr></td><td><h6 style="color:' + escolor + ';">' + effective_status + rewiew_feedback + '</h6></td><td><nobr>' + impressions + '</nobr></td><td><nobr>' + clicks + '</nobr></td><td><nobr>' + results + '</nobr></td><td><nobr>' + adspent + '</nobr></td><td><nobr>' + cpl + '</nobr></td><td><nobr>' + cpm + '</nobr></td><td style="vertical-align:middle"><nobr>' + ctr + '</nobr></td></td><td><nobr>' + cpc + '</nobr></td>';
-                        tr.innerHTML = tabble_text;
-                        parent.appendChild(tr);
-                    }
-                }
+        for (const ads in adAccount.ads) {
+            const adsObj = adAccount.ads[ads];
+            for (const adss in adsObj) {
+                const ad = adAccount.ads[ads][adss];
+                processAd(ad, adss, adsObj, id, totalStats, parent, show, adAccount['account_status'], adAccount['disable_reason']);
             }
         }
     }
 }
 
+function createAccountRow(accountData, show, accName) {
+    const {
+        name: username,
+        account_status,
+        disable_reason,
+        adtrust_dsl,
+        currency,
+        id,
+        ads,
+        adspaymentcycle,
+        current_unbilled_spend,
+        funding_source_details,
+        adspixels,
+        insights,
+    } = accountData;
+
+    const bill = adspaymentcycle?.data?.[0]?.threshold_amount;
+    const billing = bill ? '/' + mathMoney(parseFloat(bill)).toString() : '';
+    const currunbilled = current_unbilled_spend?.amount ? '/' + current_unbilled_spend.amount : '';
+    const card = funding_source_details?.display_string
+        ? ' (' + funding_source_details.display_string + ' ' + currency + ')'
+        : '';
+
+    const ascolor = account_status === 1 || account_status === 'ACTIVE' ? 'Lime' : 'Red';
+    const dscolor = disable_reason === 0 ? 'Lime' : 'Red';
+
+    const sep = disable_reason !== 0 ? ' - ' : '';
+    const pixelid = adspixels?.data?.[0]?.id ?? '';
+
+    const rkid = insights?.data?.[0]?.account_id ?? '';
+    const rkstart = insights?.data?.[0]?.date_start ?? '';
+    const rkstop = insights?.data?.[0]?.date_stop ?? '';
+    const rkspent = insights?.data?.[0]?.spend ?? '';
+
+    const tr = document.createElement('tr');
+    tr.id = id;
+    tr.className = 'poster';
+
+    const accountStatusText = `<span style="color:${ascolor}">${account_statuses[account_status]}</span>`;
+    const disableReasonText = `<span style="color:${dscolor}">${disable_reasons[disable_reason]}</span>`;
+    const accountInfo = `${accName}:${username} (${accountStatusText}${sep}${disableReasonText}) - ${adtrust_dsl}${billing}${currunbilled}${card}`;
+    const insightsInfo = `Start: ${rkstart} | Stop: ${rkstop}<br>Spent: ${rkspent}<br>ID: ${rkid}<br>Pixel: ${pixelid}<br>`;
+    const rowData = `<td colspan="3"><div class="descr">${insightsInfo}</div>${accountInfo}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>`;
+
+    if (show === 'active') {
+        if (account_status === 1 && disable_reason === 0) {
+            tr.style = 'box-shadow: rgba(15, 17, 19, 0.63) 0px 0px 20px 2px;';
+            tr.innerHTML = rowData;
+        }
+    } else {
+        tr.style = 'box-shadow: rgba(15, 17, 19, 0.63) 0px 0px 20px 2px;';
+        tr.innerHTML = rowData;
+    }
+
+    return tr;
+}
+
+function processAd(ad, adss, adsObj, id, totalStats, parent, show, account_status, disable_reason) {
+    if (!ad.status) return;
+
+    const accStatus = account_statuses[account_status];
+    const disReason = disable_reasons[disable_reason];
+    const effectiveStatus = ad.effective_status;
+    const adCreative = ad.adcreatives.data[0];
+
+    const fullImageUrl = adCreative.image_url || '';
+    const thumbnailUrl = adCreative.thumbnail_url || '';
+
+    const imageCell = getImageCell(fullImageUrl, thumbnailUrl);
+
+    const link = adCreative.object_story_spec?.link_data?.link || '';
+    const name = link ? `<a href='${link}' target='_blank'>${ad.name}</a>` : ad.name;
+
+    const stats = updateAndGetStats(ad, totalStats);
+
+    if (adss === Object.keys(adsObj)[Object.keys(adsObj).length - 1]) {
+        updateTotalRow(id, totalStats);
+    }
+
+    const esColor = getStatusColor(effectiveStatus);
+    const reviewFeedback = getReviewFeedback(ad.ad_review_feedback);
+
+    const tr = createTableRowContent(show, accStatus, disReason, effectiveStatus, name, esColor, stats, imageCell, reviewFeedback);
+    parent.appendChild(tr);
+}
+
+function updateAndGetStats(ad, stats) {
+    const impressions = ad.impressions || 0;
+    const clicks = ad.insights.data[0].inline_link_clicks || 0;
+    const results = ad.result || 0;
+    const adspent = mathMoney(ad.spent) || 0;
+    const cpl = ad.cost_per_lead_fb ? mathMoney(ad.cost_per_lead_fb) : 0;
+    const ctr = ad.insights.data[0].inline_link_click_ctr ? mathStat(ad.insights.data[0].inline_link_click_ctr) : 0;
+    const cpm = ad.insights.data[0].cpm ? mathStat(ad.insights.data[0].cpm) : 0;
+    const cpc = ad.insights.data[0].cpc ? mathStat(ad.insights.data[0].cpc) : 0;
+
+    return {
+        impressions,
+        clicks,
+        results,
+        adspent,
+        cpl,
+        cpm,
+        ctr,
+        cpc,
+        updatedStats: {
+            tImpressions: stats.tImpressions + parseInt(impressions),
+            tClicks: stats.tClicks + parseInt(clicks),
+            tResult: stats.tResult + parseInt(results),
+            tSpent: stats.tSpent + parseFloat(adspent),
+            tCPL: cpl ? [...stats.tCPL, cpl] : stats.tCPL,
+            tCPM: cpm ? [...stats.tCPM, cpm] : stats.tCPM,
+            tCTR: ctr ? [...stats.tCTR, ctr] : stats.tCTR,
+            tCPC: cpc ? [...stats.tCPC, cpc] : stats.tCPC,
+        },
+    };
+}
+
+function updateTotalRow(id, stats) {
+    const tds = document.getElementById(id).getElementsByTagName("td");
+    const totals = [
+        stats.tImpressions,
+        stats.tClicks,
+        stats.tResult,
+        parseFloat(stats.tSpent).toFixed(2),
+        average(stats.tCPL),
+        average(stats.tCPM),
+        average(stats.tCTR),
+        average(stats.tCPC),
+    ];
+
+    for (let idx = 1; idx < tds.length; idx++) {
+        tds[idx].innerHTML = idx === 3 || idx === 4 ? parseFloat(totals[idx - 1]).toFixed(2) : totals[idx - 1];
+    }
+}
+
+function getImageCell(fullImageUrl, thumbnailUrl) {
+    if (fullImageUrl) {
+        return `<td><a href='${fullImageUrl}' target='_blank'><img src='${thumbnailUrl}' width='50' height='50'></a></td>`;
+    } else if (thumbnailUrl) {
+        return `<td><img src='${thumbnailUrl}' width='50' height='50'></td>`;
+    } else {
+        return "<td><h6 style='color: red;'>Thumbnail unavailable<p>, ad is deleted</h6></td>";
+    }
+}
+
+function getStatusColor(effectiveStatus) {
+    if (effectiveStatus === 'ACTIVE') {
+        return 'Lime';
+    } else if (['ADSET_PAUSED', 'CAMPAIGN_PAUSED', 'PENDING_REVIEW'].includes(effectiveStatus)) {
+        return 'Gold';
+    } else {
+        return 'Red';
+    }
+}
+
+function getReviewFeedback(adReviewFeedback) {
+    let feedback = '';
+
+    if (adReviewFeedback?.global) {
+        for (const glo in adReviewFeedback.global) {
+            feedback = `<br>${glo}`;
+        }
+    }
+
+    return feedback;
+}
+
+function createTableRowContent(show, accStatus, disReason, effectiveStatus, name, esColor, stats, imageCell, reviewFeedback) {
+    if (show === 'active' && accStatus === 'ACTIVE' && !disReason && ['ACTIVE', 'CAMPAIGN_PAUSED', 'PENDING_REVIEW'].includes(effectiveStatus)) {
+        return createStatsRowContent(name, esColor, effectiveStatus, stats, imageCell, reviewFeedback);
+    } else {
+        return createStatsRowContent(name, esColor, effectiveStatus, stats, imageCell, reviewFeedback);
+    }
+}
+
+function createStatsRowContent(name, esColor, effectiveStatus, stats, imageCell, reviewFeedback) {
+    const {impressions, clicks, results, adspent, cpl, cpm, ctr, cpc} = stats;
+
+    const tr = document.createElement('tr');
+    const tdArray = [
+        imageCell,
+        `<nobr>${name}</nobr>`,
+        `<h6 style="color:${esColor};">${effectiveStatus}${reviewFeedback}</h6>`,
+        `<nobr>${impressions}</nobr>`,
+        `<nobr>${clicks}</nobr>`,
+        `<nobr>${results}</nobr>`,
+        `<nobr>${adspent}</nobr>`,
+        `<nobr>${cpl}</nobr>`,
+        `<nobr>${cpm}</nobr>`,
+        `<nobr>${ctr}</nobr>`,
+        `<nobr>${cpc}</nobr>`
+    ];
+
+    for (const tdContent of tdArray) {
+        const td = document.createElement('td');
+        td.innerHTML = tdContent;
+        tr.appendChild(td);
+    }
+
+    return tr;
+}
+
 function average(arr) {
-    let x, correctFactor = 0,
+    var x, correctFactor = 0,
         sum = 0;
     for (x = 0; x < arr.length; x++) {
         arr[x] = +arr[x];

@@ -62,12 +62,7 @@ $accounts = $serializer->deserialize();
 <script type="text/javascript">
     function clearTable() {
         let statBody = document.getElementById("statBody");
-        let list = statBody.getElementsByTagName("tr");
-        if (list.length == 0) return;
-        for (let k = list.length - 1; k <= 0; k--) {
-            let item = list[k];
-            statBody.removeChild(item);
-        }
+        statBody.innerHTML = '';
     }
 
     async function load_data() {
