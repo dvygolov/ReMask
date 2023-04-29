@@ -1,5 +1,5 @@
 <h2>
-    <a href="tokens.php?password=<?=$_GET["password"];?>">Accounts</a> |
-    <a href="index.php?password=<?=$_GET["password"];?>">Statistics</a> |
-    <a href="rules.php?password=<?=$_GET["password"];?>">Autorules</a>
+    <a href="accounts.php">Accounts</a> |
+    <a href="index.php">Statistics</a> |
+    <a href="rules.php">Autorules</a>
 </h2>

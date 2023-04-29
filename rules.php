@@ -1,7 +1,6 @@
 <?php
-include 'functions.php';
-include 'settings.php';
-if (!isset($_GET["password"]) || $_GET["password"] !== $password) die();
+require_once 'functions.php';
+require_once 'checkpassword.php';
 ?>
 <html>
 <head>
@@ -10,18 +9,18 @@ if (!isset($_GET["password"]) || $_GET["password"] !== $password) die();
     <link href="styles/signin.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="styles/img/favicon.png">
     <script src="scripts/js.js"></script>
-    <title><?=include 'version.php'?></title>
+    <title><?php include 'version.php'?></title>
 </head>
 <body class="text-center">
-<?= include 'menu.php' ?>
+<?= include 'menu.php'?>
 <?php
 $fbApi = "https://graph.facebook.com/v16.0/";
 $action = isset($_REQUEST["act"]) ? $_REQUEST["act"] : '';
 switch ($action) {
     case "add":
     {
-        if (file_exists($fileName)) {
-            $fileLines = file($fileName, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if (file_exists(FILENAME)) {
+            $fileLines = file(FILENAME, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
             $countLines = 0;
             $delimiter = ","; //CSV delimiter character: , ; /t
             $enclosure = '"'; //CSV enclosure character: " '

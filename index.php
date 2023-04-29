@@ -1,86 +1,79 @@
-<?php 
-include 'settings.php';
-if(!isset($_GET["password"]) || $_GET["password"] !== $password) die("No password given!"); 
+<?php
+ini_set('error_reporting', E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+require_once 'checkpassword.php';
+require_once 'classes.php';
+
+$serializer = new FBAccountSerializer(FILENAME);
+$accounts = $serializer->deserialize();
 ?>
 <!DOCTYPE html>
 <html lang="en">
-  <head class="text-center">
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=2, shrink-to-fit=no" />
-    <link href="styles/bootstrap.min.css" rel="stylesheet" />
-    <link href="styles/signin.css" rel="stylesheet" />
-	<link rel="icon" type="image/png" href="styles/img/favicon.png">
-    <script src="styles/jquery-2.1.4.min.js"></script> 
+<head class="text-center">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=2, shrink-to-fit=no"/>
+    <link href="styles/bootstrap.min.css" rel="stylesheet"/>
+    <link href="styles/signin.css" rel="stylesheet"/>
+    <link rel="icon" type="image/png" href="styles/img/favicon.png">
+    <script src="styles/jquery-2.1.4.min.js"></script>
     <script src="styles/bootstrap.min.js"></script>
     <script src="scripts/loadstat.js"></script>
-    <title><?=include 'version.php'?></title>
-  </head>
-  <body class="text-center">
-  <div class="form-group">
-      <?= include 'menu.php'?>
-	<br/>
-	<b style="color:#c8ccd6">Загрузка статистики</b> 
-	<br/>
-	<br/>
-	<select id="selectbox2" name="selectbox2" class="form-control" style="text-align:center;">
-	<?php
-	if(file_exists($fileName)){     
-   		$fileLines = file($fileName, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-		$countLines = 0;
-		$delimiter = ","; //CSV delimiter character: , ; /t
-		$enclosure = '"'; //CSV enclosure character: " ' 
-		echo '<option value=all>Загрузить все</option>';
-		foreach ($fileLines as $line) {
-			if(trim($line) === '') continue;
-			$arrayFields = array_map('trim', str_getcsv($line, $delimiter, $enclosure)); //Convert line to array
-			$value=$arrayFields[1];
-			if (count($arrayFields)>2)
-				$value.='|'.$arrayFields[2];
-			printf("<option value='%s'>%s</option>",$value,$arrayFields[0]);
-		}
-	}
-	?>
-	</select>
-	<select id='selectbox3' class='form-control'>
-		<option value='active'>Только активные</option>
-		<option value='all'>Показывать все</option>
-		<option value='active_total'>Тотал по активным</option>
-		<option value='all_total'>Тотал по всем</option>
-	  </select> 
-	  <select id='selectbox1' class='form-control'>
-		<option value='today'>За сегодня</option>
-		<option value='yesterday'>За вчера</option>
-		<option value='lifetime'>За все время</option>
-		<option value='last_7d'>За последние 7 дней</option>
-		<option value='last_month'>За последний месяц</option>
-	  </select> 
-	  <input type="button" name="load" onclick="load_data()" class="btn btn-primary" value="Загрузить" />
-	  <br/>
-	  <br/>
-	  <form method="post">
-		<input type="submit" name="delete" class="btn btn-danger" value="Очистить стату" />
-	  </form>
-  </div>
-  <table class="table table-dark table-hover" style="font-size: 16px;">
+    <title><?php include 'version.php' ?></title>
+</head>
+<body class="text-center">
+<div class="form-group">
+    <?= include 'menu.php' ?>
+    <br/>
+    <b style="color:#c8ccd6">Statistics</b>
+    <br/>
+    <br/>
+    <select id="selectbox2" name="selectbox2" class="form-control" style="text-align:center;">
+        <option value=all>Load all</option>
+        <?php foreach ($accounts as $acc) {?>
+                <option value="<?=$acc->name?>"><?=$acc->name?></option>
+        <?php } ?>
+    </select>
+    <select id='selectbox3' class='form-control'>
+        <option value='active'>Only active</option>
+        <option value='all'>Show All</option>
+        <option value='active_total'>Total Active</option>
+        <option value='all_total'>All Total</option>
+    </select>
+    <select id='selectbox1' class='form-control'>
+        <option value='today'>Today</option>
+        <option value='yesterday'>Yesterday</option>
+        <option value='lifetime'>Maximum</option>
+        <option value='last_7d'>Last 7 days</option>
+        <option value='last_month'>Last Month</option>
+    </select>
+    <input type="button" name="load" onclick="load_data()" class="btn btn-primary" value="Load"/>
+    <br/>
+    <br/>
+    <form method="post">
+        <input type="submit" name="delete" class="btn btn-danger" value="Clear"/>
+    </form>
+</div>
+<table class="table table-dark table-hover" style="font-size: 16px;">
     <tbody id="statBody"></tbody>
-  </table>
-  <div id='message'></div>
-  <a href="https://vk.com/tron_cpa">©ТРОН</a> | <a href="https://t.me/adamusfb">Scripts by Adam</a> | <a href="https://vk.com/bearded_cpa">Бородатый арбитраж</a> | <a href="https://t.me/yellow_web">Жёлтый Веб</a>
-  <script type="text/javascript">
-    function clearTable(){
-		var statBody=document.getElementById("statBody");
-		var list = statBody.getElementsByTagName("tr");
-		if (list.length==0) return;
-		for (var k = list.length - 1; k <= 0; k--) {
-			var item = list[k];
-			statBody.removeChild(item);
-		}
-	}
+</table>
+<div id='message'></div>
+<?= include 'copyright.php' ?>
+<script type="text/javascript">
+    function clearTable() {
+        let statBody = document.getElementById("statBody");
+        let list = statBody.getElementsByTagName("tr");
+        if (list.length == 0) return;
+        for (let k = list.length - 1; k <= 0; k--) {
+            let item = list[k];
+            statBody.removeChild(item);
+        }
+    }
 
-    function load_data(){
-        clearTable();  
-        loadAllStatistics();
-	}
-  </script>
-  </body>
+    async function load_data() {
+        clearTable();
+        await loadAllStatistics();
+    }
+</script>
+</body>
 </html>
