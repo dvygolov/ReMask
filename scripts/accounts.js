@@ -8,8 +8,9 @@ async function addAccount() {
     window.location.reload();
 }
 
-async function delAccount() {
+async function delAccount(name) {
     let resp = await fetch(`ajax/delAccount.php?name=${name}`);
+    window.location.reload();
 }
 
 async function validate_form(name,token,cookies,proxy) {

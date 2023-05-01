@@ -33,7 +33,7 @@ $accounts = $serializer->deserialize();
         <TR>
             <TD class='nameclmn'><?= $accounts[$i]->name ?></TD>
             <TD class='tokenclmn'><?= $accounts[$i]->token ?></TD>
-            <TD><a onclick="delAccount(<?= $accounts[$i]->name ?>)">[Delete]</a></TD>
+            <TD><a href="#" onclick="delAccount('<?= $accounts[$i]->name ?>')">[Delete]</a></TD>
         </TR>
     <?php } ?>
     </tbody>

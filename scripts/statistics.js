@@ -41,9 +41,8 @@ async function loadAllStatistics() {
         ? Array.from(accNamesSelect.options).filter(option => option.value !== 'all').map(option => option.value)
         : [accNamesSelect.value];
 
-    console.log(selectedAccounts);
-    const accTrs = await Promise.all(selectedAccounts.map(aName => load(aName, datetime, showAll)));
-    accTrs.forEach(accTr => parent.appendChild(accTr));
+    const allAccsTrs = await Promise.all(selectedAccounts.map(aName => load(aName, datetime, showAll)));
+    allAccsTrs.forEach(accTrs => accTrs.forEach(accTr=>parent.appendChild(accTr)));
 }
 
 
@@ -51,9 +50,9 @@ async function loadAllStatistics() {
 async function load(accName, datetime, showAll) {
     let trs = [];
     let accounts = await fetchData(accName, datetime);
-    for (const account in accounts.data) {
-        const adAccount = accounts.data[account];
-        const accountRow = createAccountRow(adAccount, showAll, accName);
+    for (const accIndex in accounts.data) {
+        const adAccount = accounts.data[accIndex];
+        const accountRow = createAccountRow(accName, adAccount, showAll);
         trs.push(accountRow);
 
         const id = adAccount['id'];
@@ -72,14 +71,15 @@ async function load(accName, datetime, showAll) {
 
         for (const adIndex in adAccount.ads.data) {
             const ad = adAccount.ads.data[adIndex];
-            let tr = processAd(ad, adss, adsObj, id, totalStats, showAll, adAccount['account_status'], adAccount['disable_reason']);
+            let tr = processAd(ad, totalStats, showAll, adAccount['account_status'], adAccount['disable_reason']);
             trs.push(tr);
         }
+        updateTotalRow(accountRow, totalStats);
     }
     return trs;
 }
 
-function createAccountRow(accountData, showAll, accName) {
+function createAccountRow(accName, accountData, showAll) {
     const {
         name: username,
         account_status,
@@ -121,7 +121,7 @@ function createAccountRow(accountData, showAll, accName) {
     const disableReasonText = `<span style="color:${dscolor}">${disable_reasons[disable_reason]}</span>`;
     const accountInfo = `${accName}:${username} (${accountStatusText}${sep}${disableReasonText}) - ${adtrust_dsl}${billing}${currunbilled}${card}`;
     const insightsInfo = `Start: ${rkstart} | Stop: ${rkstop}<br>Spent: ${rkspent}<br>ID: ${rkid}<br>Pixel: ${pixelid}<br>`;
-    const rowData = `<td colspan="3"><div class="descr">${insightsInfo}</div>${accountInfo}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>`;
+    const rowData = `<td colspan="3" style="text-align:left;padding-left:15px;"><div class="descr">${insightsInfo}</div>${accountInfo}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>`;
 
     if (!showAll) {
         if (account_status === 1 && disable_reason === 0) {
@@ -136,7 +136,7 @@ function createAccountRow(accountData, showAll, accName) {
     return tr;
 }
 
-function processAd(ad, id, totalStats, showAll, account_status, disable_reason) {
+function processAd(ad, totalStats, showAll, account_status, disable_reason) {
     const accStatus = account_statuses[account_status];
     const disReason = disable_reasons[disable_reason];
     const effectiveStatus = ad.effective_status;
@@ -150,19 +150,16 @@ function processAd(ad, id, totalStats, showAll, account_status, disable_reason) 
     const link = adCreative.object_story_spec?.link_data?.link || '';
     const name = link ? `<a href='${link}' target='_blank'>${ad.name}</a>` : ad.name;
 
-    const stats = updateAndGetStats(ad, totalStats);
-
-    if (adss === Object.keys(adsObj)[Object.keys(adsObj).length - 1]) {
-        updateTotalRow(id, totalStats);
-    }
+    let adStats = getStats(ad);
+    updateTotalStats(adStats, totalStats);
 
     const esColor = getStatusColor(effectiveStatus);
     const reviewFeedback = getReviewFeedback(ad.ad_review_feedback);
 
-    return createTableRowContent(showAll, accStatus, disReason, effectiveStatus, name, esColor, stats, imageCell, reviewFeedback);
+    return createTableRowContent(showAll, accStatus, disReason, effectiveStatus, name, esColor, adStats, imageCell, reviewFeedback);
 }
 
-function updateAndGetStats(ad, stats) {
+function getStats(ad) {
     const impressions = ad.impressions || 0;
     const clicks = ad.insights.data[0].inline_link_clicks || 0;
     const results = ad.result || 0;
@@ -171,32 +168,25 @@ function updateAndGetStats(ad, stats) {
     const ctr = ad.insights.data[0].inline_link_click_ctr ? mathStat(ad.insights.data[0].inline_link_click_ctr) : 0;
     const cpm = ad.insights.data[0].cpm ? mathStat(ad.insights.data[0].cpm) : 0;
     const cpc = ad.insights.data[0].cpc ? mathStat(ad.insights.data[0].cpc) : 0;
-
-    return {
-        impressions,
-        clicks,
-        results,
-        adspent,
-        cpl,
-        cpm,
-        ctr,
-        cpc,
-        updatedStats: {
-            tImpressions: stats.tImpressions + parseInt(impressions),
-            tClicks: stats.tClicks + parseInt(clicks),
-            tResult: stats.tResult + parseInt(results),
-            tSpent: stats.tSpent + parseFloat(adspent),
-            tCPL: cpl ? [...stats.tCPL, cpl] : stats.tCPL,
-            tCPM: cpm ? [...stats.tCPM, cpm] : stats.tCPM,
-            tCTR: ctr ? [...stats.tCTR, ctr] : stats.tCTR,
-            tCPC: cpc ? [...stats.tCPC, cpc] : stats.tCPC,
-        },
-    };
+    return {impressions, clicks, results, adspent, cpl, ctr, cpm, cpc};
 }
 
-function updateTotalRow(id, stats) {
-    return;
-    const tds = document.getElementById(id).getElementsByTagName("td");
+function updateTotalStats(adStats, totalStats) {
+    const {impressions, clicks, results, adspent, cpl, ctr, cpm, cpc} = adStats;
+
+    totalStats.tImpressions += parseInt(impressions);
+    totalStats.tClicks += parseInt(clicks);
+    totalStats.tResult += parseInt(results);
+    totalStats.tSpent += parseFloat(adspent);
+
+    if (cpl) totalStats.tCPL.push(cpl);
+    if (cpm) totalStats.tCPM.push(cpm);
+    if (ctr) totalStats.tCTR.push(ctr);
+    if (cpc) totalStats.tCPC.push(cpc);
+}
+
+function updateTotalRow(accountRow, stats) {
+    const tds = accountRow.getElementsByTagName("td");
     const totals = [
         stats.tImpressions,
         stats.tClicks,
@@ -209,9 +199,10 @@ function updateTotalRow(id, stats) {
     ];
 
     for (let idx = 1; idx < tds.length; idx++) {
-        tds[idx].innerHTML = idx === 3 || idx === 4 ?
+        let tdValue = idx === 3 || idx === 4 ?
             parseFloat(totals[idx - 1]).toFixed(2) :
             totals[idx - 1];
+        tds[idx].innerHTML = `<b>${tdValue}</b>`
     }
 }
 
