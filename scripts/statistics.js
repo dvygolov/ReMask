@@ -23,73 +23,38 @@ const account_statuses = {
     202: 'ANY_CLOSED'
 };
 
-var show, parent;
+
+async function load_data() {
+    clearTable();
+    await loadAllStatistics();
+}
 
 async function loadAllStatistics() {
-    let datetime = document.getElementById('selectbox1').value;
-    let accName = document.getElementById('selectbox2').value;
-    show = document.getElementById('selectbox3').value; //active or all
-    parent = document.getElementById('statBody');
+    let parent = document.getElementById('statBody');
+    addTableHeader(parent);
 
-    //Add table header
-    let tr = document.createElement('tr');
-    const headers = [
-        'Creo', 'Name/Link/Pixel', 'Status/Reason', 'Impres.', 'Clicks', 'Results',
-        'Spend', 'CPL', 'CPM', 'CTR', 'CPC'
-    ];
-    headers.forEach(headerText => {
-        const th = document.createElement('th');
-        th.textContent = headerText;
-        tr.appendChild(th);
-    });
-    parent.appendChild(tr);
+    let showAll = document.getElementById('showParam').value === "all"; //active or all
+    let datetime = document.getElementById('dateRange').value;
 
-    let selectData = [];
-    const selectbox2 = document.getElementById('selectbox2');
-    const options = selectbox2.options;
-    for (let i = 0; i < options.length; i++) {
-        selectData.push(options[i].value);
-    }
+    const accNamesSelect = document.getElementById('accNames');
+    const selectedAccounts = accNamesSelect.value === 'all'
+        ? Array.from(accNamesSelect.options).filter(option => option.value !== 'all').map(option => option.value)
+        : [accNamesSelect.value];
 
-    if (accName === 'all') {
-        for (let idx = 1; idx < selectData.length; idx++) {
-            await load(selectData[idx], datetime);
-        }
-    } else {
-        await load(selectbox2.options[selectbox2.selectedIndex].value, datetime);
-    }
+    console.log(selectedAccounts);
+    const accTrs = await Promise.all(selectedAccounts.map(aName => load(aName, datetime, showAll)));
+    accTrs.forEach(accTr => parent.appendChild(accTr));
 }
 
-async function fetchData(accName, datetime) {
-    let url = 'fbstats.php?fields=adspixels,promote_pages{access_token,id},insights.date_preset(' + datetime + '),ads.date_preset(' + datetime + ').time_increment(' + datetime + ').limit(500){insights.limit(500).date_preset(' + datetime + '){results,inline_link_click_ctr,inline_link_clicks,ctr,cpc,cpm},creative{effective_object_story_id,effective_instagram_story_id,actor_id},adlabels,created_time,recommendations,updated_time,ad_review_feedback,bid_info,configured_status,delivery_info,status,effective_status,adcreatives.limit(500){place_page_set_id,object_story_spec{instagram_actor_id,link_data{link},page_id},image_crops,image_url,status,thumbnail_url},result,cost_per_lead_fb,name,clicks,spent,cost_per,reach,link_ctr,impressions},date{' + datetime + '},funding_source_details,business{name,link},adrules_library{name},current_unbilled_spend,adspaymentcycle,spend_cap,amount_spent,age,disable_reason,account_status,balance,all_payment_methods{pm_credit_card{account_id,credential_id,display_string,exp_month,exp_year}},currency,timezone_name,created_time,name,status,adtrust_dsl&acc_name=' + accName;
-    try {
-        let response = await fetch(url);
-
-        if (response.status === 400) {
-            let json = await response.json();
-
-            if (accName !== 'all') {
-                alert(json.error.message);
-            } else {
-                alert("Error message is in console!");
-                console.log("%c%s%c: %c%s", "color: blue", accName, "background: inherit;", "font-weight: bold; color: red; font-style: italic;", json.error.message);
-            }
-        }
-
-        return await response.json();
-        // Do something with the accounts
-    } catch (error) {
-        console.error("Error fetching data: ", error);
-    }
-}
 
 // Example usage
-async function load(accName, datetime) {
-    var accounts = await fetchData(accName, datetime);
+async function load(accName, datetime, showAll) {
+    let trs = [];
+    let accounts = await fetchData(accName, datetime);
     for (const account in accounts.data) {
         const adAccount = accounts.data[account];
-        const accountRow = createAccountRow(adAccount, show, accName);
-        parent.appendChild(accountRow);
+        const accountRow = createAccountRow(adAccount, showAll, accName);
+        trs.push(accountRow);
 
         const id = adAccount['id'];
         const totalStats = {
@@ -105,17 +70,16 @@ async function load(accName, datetime) {
 
         if (!adAccount.ads) continue;
 
-        for (const ads in adAccount.ads) {
-            const adsObj = adAccount.ads[ads];
-            for (const adss in adsObj) {
-                const ad = adAccount.ads[ads][adss];
-                processAd(ad, adss, adsObj, id, totalStats, parent, show, adAccount['account_status'], adAccount['disable_reason']);
-            }
+        for (const adIndex in adAccount.ads.data) {
+            const ad = adAccount.ads.data[adIndex];
+            let tr = processAd(ad, adss, adsObj, id, totalStats, showAll, adAccount['account_status'], adAccount['disable_reason']);
+            trs.push(tr);
         }
     }
+    return trs;
 }
 
-function createAccountRow(accountData, show, accName) {
+function createAccountRow(accountData, showAll, accName) {
     const {
         name: username,
         account_status,
@@ -159,7 +123,7 @@ function createAccountRow(accountData, show, accName) {
     const insightsInfo = `Start: ${rkstart} | Stop: ${rkstop}<br>Spent: ${rkspent}<br>ID: ${rkid}<br>Pixel: ${pixelid}<br>`;
     const rowData = `<td colspan="3"><div class="descr">${insightsInfo}</div>${accountInfo}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>`;
 
-    if (show === 'active') {
+    if (!showAll) {
         if (account_status === 1 && disable_reason === 0) {
             tr.style = 'box-shadow: rgba(15, 17, 19, 0.63) 0px 0px 20px 2px;';
             tr.innerHTML = rowData;
@@ -172,9 +136,7 @@ function createAccountRow(accountData, show, accName) {
     return tr;
 }
 
-function processAd(ad, adss, adsObj, id, totalStats, parent, show, account_status, disable_reason) {
-    if (!ad.status) return;
-
+function processAd(ad, id, totalStats, showAll, account_status, disable_reason) {
     const accStatus = account_statuses[account_status];
     const disReason = disable_reasons[disable_reason];
     const effectiveStatus = ad.effective_status;
@@ -197,8 +159,7 @@ function processAd(ad, adss, adsObj, id, totalStats, parent, show, account_statu
     const esColor = getStatusColor(effectiveStatus);
     const reviewFeedback = getReviewFeedback(ad.ad_review_feedback);
 
-    const tr = createTableRowContent(show, accStatus, disReason, effectiveStatus, name, esColor, stats, imageCell, reviewFeedback);
-    parent.appendChild(tr);
+    return createTableRowContent(showAll, accStatus, disReason, effectiveStatus, name, esColor, stats, imageCell, reviewFeedback);
 }
 
 function updateAndGetStats(ad, stats) {
@@ -234,6 +195,7 @@ function updateAndGetStats(ad, stats) {
 }
 
 function updateTotalRow(id, stats) {
+    return;
     const tds = document.getElementById(id).getElementsByTagName("td");
     const totals = [
         stats.tImpressions,
@@ -247,7 +209,9 @@ function updateTotalRow(id, stats) {
     ];
 
     for (let idx = 1; idx < tds.length; idx++) {
-        tds[idx].innerHTML = idx === 3 || idx === 4 ? parseFloat(totals[idx - 1]).toFixed(2) : totals[idx - 1];
+        tds[idx].innerHTML = idx === 3 || idx === 4 ?
+            parseFloat(totals[idx - 1]).toFixed(2) :
+            totals[idx - 1];
     }
 }
 
@@ -262,30 +226,24 @@ function getImageCell(fullImageUrl, thumbnailUrl) {
 }
 
 function getStatusColor(effectiveStatus) {
-    if (effectiveStatus === 'ACTIVE') {
-        return 'Lime';
-    } else if (['ADSET_PAUSED', 'CAMPAIGN_PAUSED', 'PENDING_REVIEW'].includes(effectiveStatus)) {
-        return 'Gold';
-    } else {
-        return 'Red';
+    switch (effectiveStatus) {
+        case 'ACTIVE':
+            return 'Lime';
+        case 'ADSET_PAUSED':
+        case 'CAMPAIGN_PAUSED':
+        case 'PENDING_REVIEW':
+            return 'Gold';
+        default:
+            return 'Red';
     }
 }
 
-function getReviewFeedback(adReviewFeedback) {
-    let feedback = '';
+const getReviewFeedback = (adReviewFeedback) => adReviewFeedback?.global ? Object.keys(adReviewFeedback.global).join('<br>') : '';
 
-    if (adReviewFeedback?.global) {
-        for (const glo in adReviewFeedback.global) {
-            feedback = `<br>${glo}`;
-        }
-    }
-
-    return feedback;
-}
-
-function createTableRowContent(show, accStatus, disReason, effectiveStatus, name, esColor, stats, imageCell, reviewFeedback) {
-    if (show === 'active' && accStatus === 'ACTIVE' && !disReason && ['ACTIVE', 'CAMPAIGN_PAUSED', 'PENDING_REVIEW'].includes(effectiveStatus)) {
-        return createStatsRowContent(name, esColor, effectiveStatus, stats, imageCell, reviewFeedback);
+function createTableRowContent(showAll, accStatus, disReason, effectiveStatus, name, esColor, stats, imageCell, reviewFeedback) {
+    if (!showAll) {
+        if (accStatus === 'ACTIVE' && !disReason && ['ACTIVE', 'CAMPAIGN_PAUSED', 'PENDING_REVIEW'].includes(effectiveStatus))
+            return createStatsRowContent(name, esColor, effectiveStatus, stats, imageCell, reviewFeedback);
     } else {
         return createStatsRowContent(name, esColor, effectiveStatus, stats, imageCell, reviewFeedback);
     }
@@ -294,7 +252,6 @@ function createTableRowContent(show, accStatus, disReason, effectiveStatus, name
 function createStatsRowContent(name, esColor, effectiveStatus, stats, imageCell, reviewFeedback) {
     const {impressions, clicks, results, adspent, cpl, cpm, ctr, cpc} = stats;
 
-    const tr = document.createElement('tr');
     const tdArray = [
         imageCell,
         `<nobr>${name}</nobr>`,
@@ -309,6 +266,7 @@ function createStatsRowContent(name, esColor, effectiveStatus, stats, imageCell,
         `<nobr>${cpc}</nobr>`
     ];
 
+    const tr = document.createElement('tr');
     for (const tdContent of tdArray) {
         const td = document.createElement('td');
         td.innerHTML = tdContent;
@@ -316,6 +274,29 @@ function createStatsRowContent(name, esColor, effectiveStatus, stats, imageCell,
     }
 
     return tr;
+}
+
+async function fetchData(accName, datetime) {
+    let url = '/ajax/getAccountStatistics.php?fields=adspixels,promote_pages{access_token,id},insights.date_preset(' + datetime + '),ads.date_preset(' + datetime + ').time_increment(' + datetime + ').limit(500){insights.limit(500).date_preset(' + datetime + '){results,inline_link_click_ctr,inline_link_clicks,ctr,cpc,cpm},creative{effective_object_story_id,effective_instagram_story_id,actor_id},adlabels,created_time,recommendations,updated_time,ad_review_feedback,bid_info,configured_status,delivery_info,status,effective_status,adcreatives.limit(500){place_page_set_id,object_story_spec{instagram_actor_id,link_data{link},page_id},image_crops,image_url,status,thumbnail_url},result,cost_per_lead_fb,name,clicks,spent,cost_per,reach,link_ctr,impressions},date{' + datetime + '},funding_source_details,business{name,link},adrules_library{name},current_unbilled_spend,adspaymentcycle,spend_cap,amount_spent,age,disable_reason,account_status,balance,all_payment_methods{pm_credit_card{account_id,credential_id,display_string,exp_month,exp_year}},currency,timezone_name,created_time,name,status,adtrust_dsl&acc_name=' + accName;
+    try {
+        let response = await fetch(url);
+
+        if (response.status === 400) {
+            let json = await response.json();
+
+            if (accName !== 'all') {
+                alert(json.error.message);
+            } else {
+                alert("Error message is in console!");
+                console.log("%c%s%c: %c%s", "color: blue", accName, "background: inherit;", "font-weight: bold; color: red; font-style: italic;", json.error.message);
+            }
+        }
+
+        return await response.json();
+        // Do something with the accounts
+    } catch (error) {
+        console.error("Error fetching data: ", error);
+    }
 }
 
 function average(arr) {
@@ -346,4 +327,23 @@ function mathStat(num) {
         num = parseFloat(num).toFixed(2);
     } else num = 0;
     return num;
+}
+
+function addTableHeader(parent) {
+    let tr = document.createElement('tr');
+    const headers = [
+        'Creo', 'Name/Link/Pixel', 'Status/Reason', 'Impres.', 'Clicks', 'Results',
+        'Spend', 'CPL', 'CPM', 'CTR', 'CPC'
+    ];
+    headers.forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        tr.appendChild(th);
+    });
+    parent.appendChild(tr);
+}
+
+function clearTable() {
+    let statBody = document.getElementById("statBody");
+    statBody.innerHTML = '';
 }
