@@ -119,7 +119,7 @@ function createAccountRow(accName, accountData, showAll) {
 
     const accountStatusText = `<span style="color:${ascolor}">${account_statuses[account_status]}</span>`;
     const disableReasonText = `<span style="color:${dscolor}">${disable_reasons[disable_reason]}</span>`;
-    const accountInfo = `${accName}:${username} (${accountStatusText}${sep}${disableReasonText}) - ${adtrust_dsl}${billing}${currunbilled}${card}`;
+    const accountInfo = `${accName}: ${username} (${accountStatusText}${sep}${disableReasonText}) - ${adtrust_dsl}${billing}${currunbilled}${card}`;
     const insightsInfo = `Start: ${rkstart} | Stop: ${rkstop}<br>Spent: ${rkspent}<br>ID: ${rkid}<br>Pixel: ${pixelid}<br>`;
     const rowData = `<td colspan="3" style="text-align:left;padding-left:15px;"><div class="descr">${insightsInfo}</div>${accountInfo}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>`;
 
