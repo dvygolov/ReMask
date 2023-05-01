@@ -30,7 +30,7 @@ switch ($action) {
                 AddAcc($arrayFields[1], $arrayFields[0]);
             }
         }
-        Redirect("rules.php?password=" . $_GET["password"]);
+        Redirect("rules.php");
         exit;
         break;
     }
@@ -43,7 +43,7 @@ switch ($action) {
         $text = implode("\r\n", $array);
         file_put_contents($baseFileName, $text);
         $text = file_get_contents($baseFileName);
-        Redirect("rules.php?password=" . $_GET["password"]);
+        Redirect("rules.php");
         exit;
         break;
     }
@@ -118,7 +118,7 @@ switch ($action) {
         $text = implode("\r\n", $array);
         file_put_contents($baseFileName, $text);
 
-        Redirect("rules.php?password=" . $_GET["password"]);
+        Redirect("rules.php");
         exit;
         break;
     }
@@ -128,8 +128,7 @@ switch ($action) {
         $aid = $_GET["aid"];
         if ($_POST["name"] != "" && $_POST["data"] != "") {
             file_put_contents("presets/" . $_POST["name"], $_POST["data"]);
-            $pwd = $_GET["password"];
-            Redirect("rules.php?password=$pwd");
+            Redirect("rules.php");
             exit;
         }
         $adrules = ReadAdrules($aid, $token);
@@ -181,7 +180,7 @@ switch ($action) {
             $error_text = "<script src=\"js.js\"></script><div align=\"center\">Ошибки:<br><br>" . $error_text . "<br><br><br><input type=\"button\" value=\"Назад\" onclick=\"window.history.back();\"></div>";
             die($error_text);
         }
-        Redirect("rules.php?password=" . $_GET["password"]);
+        Redirect("rules.php");
         exit;
         break;
     }
@@ -199,9 +198,9 @@ switch ($action) {
                 if (($key != "token") && ($key != "nname")) {
                     $trans = $key;
                     if ($trans == "1soc") {
-                        $link_read = "<a href='rules.php?act=save&aid=" . $base[$i][$key][0]["id"] . "&token=" . $base[$i]["token"] . "&password=" . $_GET["password"] . "'>[Save]</a>";
-                        $link_reload = "<a href='rules.php?act=reload&nname=" . $base[$i]["nname"] . "&line=" . $i . "&token=" . $base[$i]["token"] . "&password=" . $_GET["password"] . "'>[Update]</a>";
-                        $link_delete = "<a href='rules.php?act=delete&line=" . $i . "&password=" . $_GET["password"] . "'>[Delete]</a>";
+                        $link_read = "<a href='rules.php?act=save&aid=" . $base[$i][$key][0]["id"] . "&token=" . $base[$i]["token"] . "'>[Save]</a>";
+                        $link_reload = "<a href='rules.php?act=reload&nname=" . $base[$i]["nname"] . "&line=" . $i . "&token=" . $base[$i]["token"] ."'>[Update]</a>";
+                        $link_delete = "<a href='rules.php?act=delete&line=" . $i . "'>[Delete]</a>";
                         $link = $link_read . " " . $link_reload . " " . $link_delete;
                         $trans = "Соц.";
                         $tempi = $i + 1;
@@ -236,7 +235,7 @@ switch ($action) {
                     $style = "style=\"display: none;\" name=\"two_" . $i2 . "\"";
                     $i2++;
                     for ($j = 0; $j < count($base[$i][$key]); $j++) {
-                        $link_read = "<a href='rules.php?act=save&aid=" . $base[$i][$key][$j]["id"] . "&token=" . $base[$i]["token"] . "&password=" . $_GET["password"] . "'>[Save]</a>";
+                        $link_read = "<a href='rules.php?act=save&aid=" . $base[$i][$key][$j]["id"] . "&token=" . $base[$i]["token"]  . "'>[Save]</a>";
                         $link = $link_read . " " . $link_write;
                         $checkname = $base[$i][$key][$j]["id"] . "|" . $base[$i]["token"];
                         $data .= "<tr $style><td><input type='checkbox' name='check[]' value='" . $checkname . "'></td><td>РА</td><td>" . $base[$i][$key][$j]["id"] . "</td><td>" . $base[$i][$key][$j]["name"] . "</td><td></td><td>" . $base[$i][$key][$j]["countadr"] . "</td><td>" . $link . "</td></tr>";
@@ -254,11 +253,11 @@ switch ($action) {
     }</style>
 <div align="center">
     <br/>
-    <form method="POST" action="rules.php?act=add&password=<?= $_GET["password"] ?>">
-        <input type='submit' class='btn btn-success' value='Загрузить данные по аккам из токенов'>
+    <form method="POST" action="rules.php?act=add">
+        <input type='submit' class='btn btn-success' value="Show all autorules">
     </form>
     <br/>
-    <form method="POST" action="rules.php?act=writemult&password=<?= $_GET["password"] ?>">
+    <form method="POST" action="rules.php?act=writemult">
         <table class="table table-dark table-hover" style="font-size: 16px;">
             <tr>
                 <th>#</th>
@@ -272,7 +271,7 @@ switch ($action) {
             <?= $data; ?>
         </table>
 
-        <b style="color:#c8ccd6">Шаблоны</b>
+        <b style="color:#c8ccd6">Templates</b>
         <br/>
         <select name='preset' class='form-control' size='8' style='width:900;' required>
             <?php
@@ -285,7 +284,7 @@ switch ($action) {
             ?>
         </select>
         <br><br>
-        <input type='submit' class='btn btn-success' value='Залить выбранный шаблон'>
+        <input type='submit' class='btn btn-success' value='Upload Selected Template'>
     </form>
 </div>
 <br/>

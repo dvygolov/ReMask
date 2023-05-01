@@ -27,7 +27,7 @@ class FbAccount
 
     public static function fromArray($accountData): FbAccount
     {
-        $proxy = is_string($accountData)?
+        $proxy = is_string($accountData['proxy'])?
             RemaskProxy::fromSemicolonString($accountData['proxy']):
             RemaskProxy::fromArray($accountData['proxy']);
         return new FbAccount(
