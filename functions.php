@@ -1,11 +1,13 @@
 <?php
 
-function Redirect($url){
+function Redirect($url): void
+{
 	echo "<script type='text/javascript'> window.location='$url';</script>";
 	return;
 }
 
-function AddAcc($token,$nname){
+function AddAcc($token,$nname): void
+{
 	if(($token!="")&&($token!="null")){
 		$url = "https://graph.facebook.com/v16.0/me/adaccounts?fields=business{name},name,account_id,created_time,adrules_library&access_token=".$token;
 		$parametrs = array(
@@ -113,7 +115,8 @@ function WriteAdrules($rule,$token,$id){
 	$result = file_get_contents($url_write, false, stream_context_create($parametrs));
 	return $result;
 }
-function ArrToStr($array, $encode = false){
+function ArrToStr($array): string
+{
 	$result = "";
 	for($i=0;$i<count($array);$i++){
 		$result.= implode("!=!=!",$array[$i]);
@@ -122,8 +125,10 @@ function ArrToStr($array, $encode = false){
 	$result = substr($result, 0, -5);
     return base64_encode($result);
 }
-function StrToArr($str, $encode = false){
-	if($encode==true) $str = base64_decode ($str);
+
+function StrToArr($str, $encode = false): array
+{
+	if($encode) $str = base64_decode ($str);
 	$temparr = explode("#@#@#",$str);
 	for($i=0;$i<count($temparr);$i++){
 		$array[$i] = explode("!=!=!",$temparr[$i]);
