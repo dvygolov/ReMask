@@ -54,8 +54,6 @@ async function load(accName, datetime, showAll) {
         const adAccount = accounts.data[accIndex];
         const accountRow = createAccountRow(accName, adAccount, showAll);
         trs.push(accountRow);
-
-        const id = adAccount['id'];
         const totalStats = {
             tImpressions: 0,
             tClicks: 0,
@@ -105,7 +103,6 @@ function createAccountRow(accName, accountData, showAll) {
     const ascolor = account_status === 1 || account_status === 'ACTIVE' ? 'Lime' : 'Red';
     const dscolor = disable_reason === 0 ? 'Lime' : 'Red';
 
-    const sep = disable_reason !== 0 ? ' - ' : '';
     const pixelid = adspixels?.data?.[0]?.id ?? '';
 
     const rkid = insights?.data?.[0]?.account_id ?? '';
@@ -119,9 +116,9 @@ function createAccountRow(accName, accountData, showAll) {
 
     const accountStatusText = `<span style="color:${ascolor}">${account_statuses[account_status]}</span>`;
     const disableReasonText = `<span style="color:${dscolor}">${disable_reasons[disable_reason]}</span>`;
-    const accountInfo = `${accName}: ${username} (${accountStatusText}${sep}${disableReasonText}) - ${adtrust_dsl}${billing}${currunbilled}${card}`;
+    const accountInfo = `${accName}: ${username} - ${adtrust_dsl}${billing}${currunbilled}${card}`;
     const insightsInfo = `Start: ${rkstart} | Stop: ${rkstop}<br>Spent: ${rkspent}<br>ID: ${rkid}<br>Pixel: ${pixelid}<br>`;
-    const rowData = `<td colspan="3" style="text-align:left;padding-left:15px;"><div class="descr">${insightsInfo}</div>${accountInfo}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>`;
+    const rowData = `<td colspan="2" style="text-align:left;padding-left:15px;"><div class="descr">${insightsInfo}</div><h5>${accountInfo}</h5></td><td><b>${accountStatusText}<br/>${disableReasonText}</b></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>`;
 
     if (!showAll) {
         if (account_status === 1 && disable_reason === 0) {
@@ -198,10 +195,10 @@ function updateTotalRow(accountRow, stats) {
         average(stats.tCPC),
     ];
 
-    for (let idx = 1; idx < tds.length; idx++) {
+    for (let idx = 2; idx < tds.length; idx++) {
         let tdValue = idx === 3 || idx === 4 ?
-            parseFloat(totals[idx - 1]).toFixed(2) :
-            totals[idx - 1];
+            parseFloat(totals[idx - 2]).toFixed(2) :
+            totals[idx - 2];
         tds[idx].innerHTML = `<b>${tdValue}</b>`
     }
 }
@@ -212,7 +209,7 @@ function getImageCell(fullImageUrl, thumbnailUrl) {
     } else if (thumbnailUrl) {
         return `<td><img src='${thumbnailUrl}' width='50' height='50'></td>`;
     } else {
-        return "<td><h6 style='color: red;'>Thumbnail unavailable<p>, ad is deleted</h6></td>";
+        return "<td><h6 style='color: red;'>Thumbnail unavailable,<br/>ad deleted</h6></td>";
     }
 }
 
@@ -246,7 +243,7 @@ function createStatsRowContent(name, esColor, effectiveStatus, stats, imageCell,
     const tdArray = [
         imageCell,
         `<nobr>${name}</nobr>`,
-        `<h6 style="color:${esColor};">${effectiveStatus}${reviewFeedback}</h6>`,
+        `<p style="color:${esColor};">${effectiveStatus}<br/> ${reviewFeedback}</p>`,
         `<nobr>${impressions}</nobr>`,
         `<nobr>${clicks}</nobr>`,
         `<nobr>${results}</nobr>`,
@@ -314,7 +311,8 @@ function mathStat(num) {
 function addTableHeader(parent) {
     let tr = document.createElement('tr');
     const headers = [
-        'Creo', 'Name/Link/Pixel', 'Status/Reason', 'Impres.', 'Clicks', 'Results',
+        'Creo', 'Name/Link', 'Status/Reason',
+        'Impres.', 'Clicks', 'Results',
         'Spend', 'CPL', 'CPM', 'CTR', 'CPC'
     ];
     headers.forEach(headerText => {
