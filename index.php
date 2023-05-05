@@ -48,7 +48,7 @@ $accounts = $serializer->deserialize();
         <option value='last_7d'>Last 7 days</option>
         <option value='last_month'>Last Month</option>
     </select>
-    <input type="button" onclick="load_data()" class="btn btn-primary" value="Load"/>
+    <input type="button" onclick="loadAllStatistics()" class="btn btn-primary" value="Load"/>
     <br/>
     <br/>
 </div>

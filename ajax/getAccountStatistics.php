@@ -19,27 +19,25 @@ disable_reason,
 adspixels{id},
 promote_pages{access_token,id},
 business{name,link},
-date{$datetime},
 all_payment_methods{pm_credit_card{account_id,credential_id,display_string,exp_month,exp_year}},
 funding_source_details,
 adrules_library{id,name},
-current_unbilled_spend,
-adspaymentcycle,
-balance,
 spend_cap,
+current_unbilled_spend,
+balance,
 amount_spent,
 adtrust_dsl,
-age,
+adspaymentcycle,
 currency,
 timezone_name,
 created_time,
 ads.date_preset($datetime).time_increment($datetime).limit(500){
+    id,
     name,
-    clicks,
-    spent,
-    reach,
-    link_ctr,
     impressions,
+    clicks,
+    link_ctr,
+    spent,
     insights.limit(500).date_preset($datetime){
         results,
         inline_link_click_ctr,
@@ -75,6 +73,8 @@ ads.date_preset($datetime).time_increment($datetime).limit(500){
         thumbnail_url
     }
 }";
+
+$requestParams = preg_replace('/\s+/', '', $requestParams);
 $req = new FbRequests();
 $resp = $req->Get($acc, "me/adaccounts?$requestParams");
 ResponseFormatter::Respond($resp);
