@@ -1,3 +1,53 @@
+class AdAccount {
+    constructor(accountData) {
+        this.id = accountData.id;
+        this.name = accountData.name;
+        this.pixelid = accountData.adspixels?.data[0]?.id??"";
+        this.spendlimit = accountData.adtrust_dsl;
+        this.billing = 0;
+        this.curspend=0;
+        this.totalspend=0;
+        this.cardinfo="";
+        this.currency = accountData.currency;
+        this.timezone = accountData.timezone_name;
+        this.account_status = accountData.account_status;
+        this.disable_reason = accountData.disable_reason;
+        this.adspaymentcycle = accountData.adspaymentcycle;
+        this.current_unbilled_spend = accountData.current_unbilled_spend;
+        this.funding_source_details = accountData.funding_source_details;
+        this.adspixels = accountData.adspixels;
+        this.insights = accountData.insights;
+        this.ads = accountData.ads ? accountData.ads.data.map(adData => new Ad(adData)) : [];
+        this.created_time = accountData.created_time;
+        this.totalStats = {
+            tImpressions: 0,
+            tClicks: 0,
+            tResult: 0,
+            tSpent: 0,
+            tCPL: [],
+            tCPM: [],
+            tCTR: [],
+            tCPC: []
+        };
+    }
+}
+
+class Ad {
+    constructor(adData) {
+        this.effective_status = adData.effective_status;
+        this.adcreatives = adData.adcreatives.data[0];
+        this.impressions = adData.impressions;
+        this.inline_link_clicks = adData.insights.data[0].inline_link_clicks;
+        this.result = adData.result;
+        this.spent = adData.spent;
+        this.cost_per_lead_fb = adData.cost_per_lead_fb;
+        this.inline_link_click_ctr = adData.insights.data[0].inline_link_click_ctr;
+        this.cpm = adData.insights.data[0].cpm;
+        this.cpc = adData.insights.data[0].cpc;
+        this.name = adData.name;
+        this.ad_review_feedback = adData.ad_review_feedback;
+    }
+}
 const disable_reasons = [
     '',
     'ADS_INTEGRITY_POLICY',
@@ -7,7 +57,7 @@ const disable_reasons = [
     'ADS_AFC_REVIEW',
     'BUSINESS_INTEGRITY_RAR',
     'PERMANENT_CLOSE',
-    'UNUSED_RESELLER_ACCOUNTR'
+    'UNUSED_RESELLER_ACCOUNT'
 ];
 
 const account_statuses = {
@@ -96,19 +146,12 @@ function createAccountRow(accName, accountData, showAll) {
     const bill = adspaymentcycle?.data?.[0]?.threshold_amount;
     const billing = bill ? '/' + mathMoney(parseFloat(bill)).toString() : '';
     const currunbilled = current_unbilled_spend?.amount ? '/' + current_unbilled_spend.amount : '';
-    const card = funding_source_details?.display_string
-        ? ' (' + funding_source_details.display_string + ' ' + currency + ')'
-        : '';
+    const card = funding_source_details?.display_string ? funding_source_details.display_string + ' (' + currency + ')' : '';
 
     const ascolor = account_status === 1 || account_status === 'ACTIVE' ? 'Lime' : 'Red';
     const dscolor = disable_reason === 0 ? 'Lime' : 'Red';
 
     const pixelid = adspixels?.data?.[0]?.id ?? '';
-
-    const rkid = insights?.data?.[0]?.account_id ?? '';
-    const rkstart = insights?.data?.[0]?.date_start ?? '';
-    const rkstop = insights?.data?.[0]?.date_stop ?? '';
-    const rkspent = insights?.data?.[0]?.spend ?? '';
 
     const tr = document.createElement('tr');
     tr.id = id;
@@ -116,9 +159,19 @@ function createAccountRow(accName, accountData, showAll) {
 
     const accountStatusText = `<span style="color:${ascolor}">${account_statuses[account_status]}</span>`;
     const disableReasonText = `<span style="color:${dscolor}">${disable_reasons[disable_reason]}</span>`;
-    const accountInfo = `${accName}: ${username} - ${adtrust_dsl}${billing}${currunbilled}${card}`;
-    const insightsInfo = `Start: ${rkstart} | Stop: ${rkstop}<br>Spent: ${rkspent}<br>ID: ${rkid}<br>Pixel: ${pixelid}<br>`;
-    const rowData = `<td colspan="2" style="text-align:left;padding-left:15px;"><div class="descr">${insightsInfo}</div><h5>${accountInfo}</h5></td><td><b>${accountStatusText}<br/>${disableReasonText}</b></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>`;
+    const accountInfo = `${accName}: ${username} - ${adtrust_dsl}${billing}${currunbilled}`;
+    const popupInfo = `ID: ${id.replace(/^act_/, '')}<br>Pixel: ${pixelid}<br> Card: ${card}`;
+    const rowData = `
+        <td colspan="2" style="text-align:left;padding-left:15px;">
+            <div class="descr">${popupInfo}</div><h5>${accountInfo}</h5>
+        </td>
+        <td>
+            <i class="fas fa-play" title="Start ad"></i> <i class="fas fa-stop" title="Stop ad"></i>
+            <i class="fas fa-upload" title="Upload autorules"></i> <i class="fas fa-download" title="Download autorules"></i>
+            <i class="fas fa-paper-plane" title="Send appeal"></i>
+        </td>
+        <td><b>${accountStatusText}<br/>${disableReasonText}</b></td>
+        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>`;
 
     if (!showAll) {
         if (account_status === 1 && disable_reason === 0) {
@@ -195,10 +248,10 @@ function updateTotalRow(accountRow, stats) {
         average(stats.tCPC),
     ];
 
-    for (let idx = 2; idx < tds.length; idx++) {
+    for (let idx = 3; idx < tds.length; idx++) {
         let tdValue = idx === 3 || idx === 4 ?
-            parseFloat(totals[idx - 2]).toFixed(2) :
-            totals[idx - 2];
+            parseFloat(totals[idx - 3]).toFixed(2) :
+            totals[idx - 3];
         tds[idx].innerHTML = `<b>${tdValue}</b>`
     }
 }
@@ -243,6 +296,7 @@ function createStatsRowContent(name, esColor, effectiveStatus, stats, imageCell,
     const tdArray = [
         imageCell,
         `<nobr>${name}</nobr>`,
+        `Button`,
         `<p style="color:${esColor};">${effectiveStatus}<br/> ${reviewFeedback}</p>`,
         `<nobr>${impressions}</nobr>`,
         `<nobr>${clicks}</nobr>`,
@@ -311,9 +365,9 @@ function mathStat(num) {
 function addTableHeader(parent) {
     let tr = document.createElement('tr');
     const headers = [
-        'Creo', 'Name/Link', 'Status/Reason',
-        'Impres.', 'Clicks', 'Results',
-        'Spend', 'CPL', 'CPM', 'CTR', 'CPC'
+        'Creo', 'Name/Link', 'Actions', 'Status/Reason',
+        'Impres.', 'Clicks', 'Results', 'Spend',
+        'CPL', 'CPM', 'CTR', 'CPC'
     ];
     headers.forEach(headerText => {
         const th = document.createElement('th');

@@ -4,14 +4,16 @@ class FbAccount
 {
     public string $name;
     public string $token;
-    public string $cookies;
+    public ?string $dtsg;
+    public array $cookies;
     public ?RemaskProxy $proxy;
 
-    public function __construct(string $name, string $token, string $cookies, RemaskProxy $proxy = null)
+    public function __construct(string $name, string $token, string $cookies, string $dtsg = null, RemaskProxy $proxy = null)
     {
         $this->name = $name;
         $this->token = $token;
-        $this->cookies = $cookies;
+        $this->cookies = json_decode($cookies, true);
+        $this->dtsg = $dtsg;
         $this->proxy = $proxy;
     }
 
@@ -21,28 +23,33 @@ class FbAccount
             'name' => $this->name,
             'token' => $this->token,
             'cookies' => $this->cookies,
+            'dtsg' => $this->dtsg,
             'proxy' => $this->proxy?->toArray()
         ];
     }
 
     public static function fromArray($accountData): FbAccount
     {
-        $proxy = is_string($accountData['proxy'])?
-            RemaskProxy::fromSemicolonString($accountData['proxy']):
+        $proxy = is_string($accountData['proxy']) ?
+            RemaskProxy::fromSemicolonString($accountData['proxy']) :
             RemaskProxy::fromArray($accountData['proxy']);
+        $cookies = is_string($accountData['cookies']) ?
+            $accountData['cookies'] :
+            json_encode($accountData['cookies']);
+
         return new FbAccount(
             $accountData['name'],
             $accountData['token'],
-            $accountData['cookies'],
+            $cookies,
+            $accountData['dtsg'] ?? null,
             $proxy
         );
     }
 
     public function getCurlCookies(): string
     {
-        $cookiesArray = json_decode($this->cookies, true);
         $cookieString = '';
-        foreach ($cookiesArray as $cookie) {
+        foreach ($this->cookies as $cookie) {
             $cookieString .= "{$cookie['name']}={$cookie['value']}; ";
         }
         return rtrim($cookieString, '; ');

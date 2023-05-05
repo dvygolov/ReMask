@@ -24,7 +24,7 @@ $accounts = $serializer->deserialize();
     <title><?php include 'version.php' ?></title>
 </head>
 <body class="text-center">
-<?= include 'menu.php' ?>
+<?php include 'menu.php' ?>
 <br/>
 <table class="centertable">
     <tbody style="color:#c8ccd6">

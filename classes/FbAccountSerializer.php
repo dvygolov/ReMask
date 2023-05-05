@@ -9,7 +9,7 @@ class FbAccountSerializer
         $this->filename = $filename;
     }
 
-    public function serialize($facebookAccounts): void
+    public function serialize(array $facebookAccounts): void
     {
         $accountsData = [];
         foreach ($facebookAccounts as $account) {

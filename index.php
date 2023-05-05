@@ -17,6 +17,7 @@ $accounts = $serializer->deserialize();
     <meta name="viewport" content="width=device-width, initial-scale=2, shrink-to-fit=no"/>
     <link href="styles/bootstrap.min.css" rel="stylesheet"/>
     <link href="styles/signin.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="styles/img/favicon.png">
     <script src="styles/jquery-2.1.4.min.js"></script>
     <script src="styles/bootstrap.min.js"></script>
@@ -25,7 +26,7 @@ $accounts = $serializer->deserialize();
 </head>
 <body class="text-center">
 <div class="form-group">
-    <?= include 'menu.php' ?>
+    <?php include 'menu.php' ?>
     <br/>
     <b style="color:#c8ccd6">Statistics</b>
     <br/>
