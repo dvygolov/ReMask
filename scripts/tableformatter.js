@@ -1,3 +1,6 @@
+import {account_statuses, disable_reasons} from "./constants.js";
+import {Actions} from "./actions.js";
+
 export class TableFormatter {
     addTableHeader(parent) {
         let tr = document.createElement('tr');
@@ -17,9 +20,16 @@ export class TableFormatter {
     formatAdAccounts(allAccs) {
         let statBody = document.getElementById('statBody');
         statBody.innerHTML = '';
+        let resAccs = allAccs.flat();
         let showAll = document.getElementById('showParam').value === 'all'; //active or all
+        if (!showAll) resAccs = resAccs.filter(acc => acc.isActive());
         this.addTableHeader(statBody);
-        allAccs.forEach(accPack => accPack.forEach(acc => statBody.appendChild(this.createAccountRow(acc, showAll))));
+        resAccs.forEach(acc => {
+            statBody.appendChild(this.createAccountRow(acc, showAll));
+            let resAds = acc.ads;
+            if (!showAll) resAds = resAds.filter(ad => ad.isActive());
+            resAds.forEach(ad => statBody.appendChild(this.createAdRow(ad)));
+        });
     }
 
     getAdStatusColor(status) {
@@ -36,14 +46,14 @@ export class TableFormatter {
     }
 
     createAdRow(ad) {
-        const imageCell = getImageCell(fullImageUrl, thumbnailUrl);
+        const imageCell = this.getImageCell(ad.imageUrl, ad.thumbUrl);
         const name = ad.link ? `<a href='${ad.link}' target='_blank'>${ad.name}</a>` : ad.name;
-        const esColor = this.getAdStatusColor(ad.effective_status);
+        const esColor = this.getAdStatusColor(ad.status);
         const tdArray = [
             imageCell,
             `<nobr>${name}</nobr>`,
-            `Button`,
-            `<p style="color:${esColor};">${effectiveStatus}<br/> ${reviewFeedback}</p>`,
+            `${this.getAdActions(ad)}`,
+            `<p style="color:${esColor};">${ad.status}<br/> ${ad.reviewFeedback}</p>`,
             `<nobr>${ad.impressions}</nobr>`,
             `<nobr>${ad.clicks}</nobr>`,
             `<nobr>${ad.results}</nobr>`,
@@ -67,29 +77,54 @@ export class TableFormatter {
         tr.id = acc.id;
         tr.className = 'poster';
 
-        const ascolor = acc.account_status === 1 || acc.account_status === 'ACTIVE' ? 'Lime' : 'Red';
-        const accountStatusText = `<span style="color:${ascolor}">${account_statuses[acc.account_status]}</span>`;
+        const ascolor = acc.status === 1 || acc.status === 'ACTIVE' ? 'Lime' : 'Red';
+        const accountStatusText = `<span style="color:${ascolor}">${account_statuses[acc.status]}</span>`;
         const drcolor = acc.disable_reason === 0 ? 'Lime' : 'Red';
         const disableReasonText = `<span style="color:${drcolor}">${disable_reasons[acc.disable_reason]}</span>`;
 
-        const accountInfo = `${acc.name} - ${acc.adtrust_dsl}${acc.billing}${acc.currunbilled}`;
-        const popupInfo = `ID: ${acc.id}<br>Pixel: ${acc.pixelid}<br> Card: ${card}`;
+        const accountInfo = `${acc.name} - ${acc.spendlimit}/${acc.billing}/${acc.curspend}`;
+        const popupInfo = `ID: ${acc.id}<br>Pixel: ${acc.pixelid}<br> Card: ${acc.cardinfo}`;
+        let actions = this.getAccActions(acc);
         const rowData = `
         <td colspan="2" style="text-align:left;padding-left:15px;">
             <div class="descr">${popupInfo}</div><h5>${accountInfo}</h5>
         </td>
-        <td>
-            <i class="fas fa-money-bill" title="Pay UNSETTLED"></i>
-            <i class="fas fa-play" title="Start ad"></i> <i class="fas fa-stop" title="Stop ad"></i>
-            <i class="fas fa-upload" title="Upload autorules"></i> <i class="fas fa-download" title="Download autorules"></i>
-            <i class="fas fa-paper-plane" title="Send appeal"></i>
-        </td>
+        <td> ${actions} </td>
         <td><b>${accountStatusText}<br/>${disableReasonText}</b></td>
         <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>`;
 
         tr.style = 'box-shadow: rgba(15, 17, 19, 0.63) 0px 0px 20px 2px;';
         tr.innerHTML = rowData;
         return tr;
+    }
+
+    getAdActions(ad) {
+        switch (ad.status) {
+            case 'DISAPPROVED':
+                return '<i class="fas fa-paper-plane" title="Send appeal" onclick="Actions.sendAdAppeal(ad);"></i>';
+                break;
+            case 'PAUSED':
+                return '<i class="fas fa-play" title="Start ad" onclick="Actions.startAd(ad);"></i>';
+                break;
+            case 'ACTIVE':
+                return '<i class="fas fa-stop" title="Stop ad" onclick="Actions.stopAd(ad);"></i>';
+                break;
+            default:
+                return '';
+        }
+    }
+
+    getAccActions(acc) {
+        let actions = "";
+        if (acc.status == 2 && acc.disable_reason == 1) // DISABLED ADS_INTEGRITY_POLICY
+            actions += '<i class="fas fa-paper-plane" title="Send appeal" onclick="Actions.sendAccAppeal(acc);"></i> ';
+        else if (acc.status == 3) //UNSETTLED
+            actions += '<i class="fas fa-money-bill" title="Pay UNSETTLED" onclick="Actions.payUnsettled(acc);"></i> ';
+        if (acc.rules.length > 0)
+            actions += `${acc.rules.length} <i class="fas fa-download" title="Download autorules" onclick="Actions.downloadRules(acc);"></i> `;
+        if (acc.status != 2)
+            actions += '<i class="fas fa-upload" title="Upload autorules" onclick="Actions.uploadRules(acc);"></i> ';
+        return actions;
     }
 
     getImageCell(fullImageUrl, thumbnailUrl) {

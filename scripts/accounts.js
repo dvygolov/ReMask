@@ -4,7 +4,13 @@ async function addAccount() {
     const cookies = document.add.cookies.value;
     const proxy = document.add.proxy.value;
     if (!await validate_form(name,token,cookies,proxy)) return;
-    let resp = await fetch(`ajax/addAccount.php?name=${name}&token=${token}&cookies=${cookies}&proxy=${proxy}`);
+    let resp = await fetch("ajax/addAccount.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `name=${encodeURIComponent(name)}&token=${encodeURIComponent(token)}&cookies=${encodeURIComponent(cookies)}&proxy=${encodeURIComponent(proxy)}`,
+    });
     window.location.reload();
 }
 
@@ -58,7 +64,13 @@ async function validate_form(name,token,cookies,proxy) {
         return false;
     }
 
-    let resp = await fetch(`ajax/checkAccount.php?name=${name}&token=${token}&cookies=${cookies}&proxy=${proxy}`);
+    let resp = await fetch("ajax/checkAccount.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `name=${encodeURIComponent(name)}&token=${encodeURIComponent(token)}&cookies=${encodeURIComponent(cookies)}&proxy=${encodeURIComponent(proxy)}`,
+    });
     if (resp.status === 200) {
         let t = await resp.text();
         let json;
@@ -66,8 +78,7 @@ async function validate_form(name,token,cookies,proxy) {
            json = JSON.parse(t);
         }
         catch{
-           console.log(t);
-           alert("Error parsing response JSON, look for error in console...");
+           alert(`Error parsing response JSON: ${t}`);
            return false;
         }
         if (json.error){

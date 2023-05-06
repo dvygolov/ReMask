@@ -7,10 +7,10 @@ require_once __DIR__ . '/../classes/FbAccountSerializer.php';
 require_once __DIR__ . '/../classes/FbRequests.php';
 require_once __DIR__ . '/../classes/ResponseFormatter.php';
 
-if (isset($_GET["name"]) && isset($_GET["token"]) && isset($_GET["cookies"])) {
+if (isset($_POST["name"]) && isset($_POST["token"]) && isset($_POST["cookies"])) {
     $serializer = new FbAccountSerializer(FILENAME);
     $accounts = $serializer->deserialize();
-    $newAcc = FbAccount::fromArray($_GET);
+    $newAcc = FbAccount::fromArray($_POST);
     $accounts[] = $newAcc;
     $serializer->serialize($accounts);
     http_response_code(200);

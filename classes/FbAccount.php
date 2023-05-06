@@ -10,9 +10,13 @@ class FbAccount
 
     public function __construct(string $name, string $token, string $cookies, string $dtsg = null, RemaskProxy $proxy = null)
     {
+        $jsonCookies = json_decode($cookies, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            die("JSON Error: " . json_last_error_msg());
+        }
         $this->name = $name;
         $this->token = $token;
-        $this->cookies = json_decode($cookies, true);
+        $this->cookies = $jsonCookies;
         $this->dtsg = $dtsg;
         $this->proxy = $proxy;
     }
@@ -33,9 +37,11 @@ class FbAccount
         $proxy = is_string($accountData['proxy']) ?
             RemaskProxy::fromSemicolonString($accountData['proxy']) :
             RemaskProxy::fromArray($accountData['proxy']);
-        $cookies = is_string($accountData['cookies']) ?
-            $accountData['cookies'] :
-            json_encode($accountData['cookies']);
+        if (is_string($accountData['cookies'])){
+            $cookies = $accountData['cookies'];
+        } else{
+            $cookies= json_encode($accountData['cookies']);
+        }
 
         return new FbAccount(
             $accountData['name'],
