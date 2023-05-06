@@ -18,7 +18,6 @@ $accounts = $serializer->deserialize();
     <link href="styles/bootstrap.min.css" rel="stylesheet"/>
     <link href="styles/signin.css" rel="stylesheet"/>
     <link rel="icon" type="image/png" href="styles/img/favicon.png">
-    <script src="styles/jquery-2.1.4.min.js"></script>
     <script src="styles/bootstrap.min.js"></script>
     <script src="scripts/accounts.js"></script>
     <title><?php include 'version.php' ?></title>

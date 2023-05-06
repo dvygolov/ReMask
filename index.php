@@ -2,10 +2,10 @@
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-require_once __DIR__.'/checkpassword.php';
-require_once __DIR__.'/classes/FBAccountSerializer.php';
-require_once __DIR__.'/classes/FbAccount.php';
-require_once __DIR__.'/classes/RemaskProxy.php';
+require_once __DIR__ . '/checkpassword.php';
+require_once __DIR__ . '/classes/FBAccountSerializer.php';
+require_once __DIR__ . '/classes/FbAccount.php';
+require_once __DIR__ . '/classes/RemaskProxy.php';
 
 $serializer = new FbAccountSerializer(FILENAME);
 $accounts = $serializer->deserialize();
@@ -19,9 +19,7 @@ $accounts = $serializer->deserialize();
     <link href="styles/signin.css" rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="styles/img/favicon.png">
-    <script src="styles/jquery-2.1.4.min.js"></script>
     <script src="styles/bootstrap.min.js"></script>
-    <script src="scripts/statistics.js"></script>
     <title><?php include 'version.php' ?></title>
 </head>
 <body class="text-center">
@@ -33,8 +31,8 @@ $accounts = $serializer->deserialize();
     <br/>
     <select id="accNames" class="form-control" style="text-align:center;">
         <option value="all">Load all</option>
-        <?php foreach ($accounts as $acc) {?>
-                <option value="<?=$acc->name?>"><?=$acc->name?></option>
+        <?php foreach ($accounts as $acc) { ?>
+            <option value="<?= $acc->name ?>"><?= $acc->name ?></option>
         <?php } ?>
     </select>
     <select id="showParam" class='form-control'>
@@ -48,13 +46,14 @@ $accounts = $serializer->deserialize();
         <option value='last_7d'>Last 7 days</option>
         <option value='last_month'>Last Month</option>
     </select>
-    <input type="button" onclick="loadAllStatistics()" class="btn btn-primary" value="Load"/>
+    <input type="button" id="loadstats" class="btn btn-primary" value="Load"/>
     <br/>
     <br/>
 </div>
 <table class="table table-dark table-hover" style="font-size: 16px;">
     <tbody id="statBody"></tbody>
 </table>
+<script src="scripts/main.js" type="module"></script>
 <div id='message'></div>
 <?= include 'copyright.php' ?>
 </body>
