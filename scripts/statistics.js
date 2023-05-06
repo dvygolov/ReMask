@@ -11,7 +11,7 @@ export async function loadAllStatistics() {
 
     const allAccs = await Promise.all(selectedAccounts.map(aName => load(aName, datetime)));
     const tf = new TableFormatter();
-    tf.formatAdAccounts(allAccs);
+    tf.formatAdAccounts(allAccs.flat());
 }
 
 async function load(accName, datetime) {

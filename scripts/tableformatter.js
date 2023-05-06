@@ -6,8 +6,8 @@ export class TableFormatter {
         let tr = document.createElement('tr');
         const headers = [
             'Creo', 'Name/Link', 'Actions', 'Status/Reason',
-            'Impres.', 'Clicks', 'Results', 'Spend',
-            'CPL', 'CPM', 'CTR', 'CPC'
+            'Results', 'CPA', 'Spend', 'Clicks', 'CPC', 'CTR',
+            'Impres.', 'CPM'
         ];
         headers.forEach(headerText => {
             const th = document.createElement('th');
@@ -20,11 +20,10 @@ export class TableFormatter {
     formatAdAccounts(allAccs) {
         let statBody = document.getElementById('statBody');
         statBody.innerHTML = '';
-        let resAccs = allAccs.flat();
         let showAll = document.getElementById('showParam').value === 'all'; //active or all
-        if (!showAll) resAccs = resAccs.filter(acc => acc.isActive());
+        if (!showAll) allAccs = allAccs.filter(acc => acc.isActive());
         this.addTableHeader(statBody);
-        resAccs.forEach(acc => {
+        allAccs.forEach(acc => {
             statBody.appendChild(this.createAccountRow(acc, showAll));
             let resAds = acc.ads;
             if (!showAll) resAds = resAds.filter(ad => ad.isActive());
