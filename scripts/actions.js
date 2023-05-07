@@ -75,16 +75,12 @@ export class Actions {
 
     static async sendRulesToServer(socname, accId, jsonString) {
         try {
-            const response = await fetch("your_php_script.php", {
+            const response = await fetch("ajax/uploadRules.php", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/x-www-form-urlencoded",
                 },
-                body: JSON.stringify({
-                    socname: socname,
-                    accId: accId,
-                    rules: jsonString
-                }),
+                body: `acc_name=${encodeURIComponent(socname)}&accid=${encodeURIComponent(accId)}&rules=${encodeURIComponent(jsonString)}`
             });
 
             if (!response.ok) {
