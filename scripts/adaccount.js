@@ -4,7 +4,8 @@ import {MathHelpers} from "./mathhelpers.js";
 export class AdAccount {
     constructor(accountData, accName) {
         this.id = accountData.id.replace(/^act_/, '');
-        this.name = `${accName}: ${accountData.name}`;
+        this.socname = accName;
+        this.name = accountData.name;
         this.pixelid = accountData.adspixels?.data[0]?.id ?? "";
         this.spendlimit = accountData.adtrust_dsl;
         this.billing = MathHelpers.mathMoney(accountData.adspaymentcycle?.data?.[0]?.threshold_amount ?? 0);

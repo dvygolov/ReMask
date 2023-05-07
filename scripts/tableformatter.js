@@ -28,7 +28,7 @@ export class TableFormatter {
             statBody.appendChild(this.createAccountRow(acc, showAll));
             let resAds = acc.ads;
             if (!showAll) resAds = resAds.filter(ad => ad.isActive());
-            resAds.forEach(ad => statBody.appendChild(this.createAdRow(ad)));
+            resAds.forEach(ad => statBody.appendChild(this.createAdRow(acc,ad)));
         });
         this.addActions();
     }
@@ -56,7 +56,7 @@ export class TableFormatter {
         const drcolor = acc.disable_reason === 0 ? 'Lime' : 'Red';
         const disableReasonText = `<span style="color:${drcolor}">${disable_reasons[acc.disable_reason]}</span>`;
 
-        const accountInfo = `${acc.name} - ${acc.spendlimit}/${acc.billing}/${acc.curspend}`;
+        const accountInfo = `${acc.socname}: ${acc.name} - ${acc.spendlimit}/${acc.billing}/${acc.curspend}`;
         const popupInfo = `
             ID: ${acc.id}<br>
             Pixel: ${acc.pixelid}<br> 
@@ -85,7 +85,8 @@ export class TableFormatter {
         tr.innerHTML = rowData;
         return tr;
     }
-    createAdRow(ad) {
+
+    createAdRow(acc, ad) {
         const imageCell = this.getImageCell(ad.imageUrl, ad.thumbUrl);
         let link = ad.link;
         if (ad.urlparams) link += ad.urlparams;
@@ -94,7 +95,7 @@ export class TableFormatter {
         const tdArray = [
             imageCell,
             `<nobr>${name}</nobr>`,
-            `${this.getAdActions(ad)}`,
+            `${this.getAdActions(acc,ad)}`,
             `<p style="color:${esColor};">${ad.status}<br/> ${ad.reviewFeedback}</p>`,
             `<nobr>${ad.results}</nobr>`,
             `<nobr>${ad.CPL}</nobr>`,
@@ -115,16 +116,16 @@ export class TableFormatter {
     }
 
 
-    getAdActions(ad) {
+    getAdActions(acc,ad) {
         switch (ad.status) {
             case 'DISAPPROVED':
-                return `<i class="fas fa-paper-plane senddisapprove" title="Send appeal" data-adid="${ad.id}"></i>`;
+                return `<i class="fas fa-paper-plane senddisapprove" title="Send appeal" data-socname="${acc.socname}" data-adid="${ad.id}"></i>`;
                 break;
             case 'PAUSED':
-                return `<i class="fas fa-play startad" title="Start ad" data-adid="${ad.id}"></i>`;
+                return `<i class="fas fa-play startad" title="Start ad" data-socname="${acc.socname}" data-adid="${ad.id}"></i>`;
                 break;
             case 'ACTIVE':
-                return `<i class="fas fa-stop stopad" title="Stop ad" data-adid="${ad.id}"></i>`;
+                return `<i class="fas fa-stop stopad" title="Stop ad" data-socname="${acc.socname}" data-adid="${ad.id}"></i>`;
                 break;
             default:
                 return '';
@@ -134,13 +135,13 @@ export class TableFormatter {
     getAccActions(acc) {
         let actions = "";
         if (acc.status == 2 && acc.disable_reason == 1) // DISABLED ADS_INTEGRITY_POLICY
-            actions += `<i class="fas fa-paper-plane sendappeal" title="Send appeal" data-accid="${acc.id}"></i> `;
+            actions += `<i class="fas fa-paper-plane sendappeal" title="Send appeal" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
         else if (acc.status == 3) //UNSETTLED
-            actions += `<i class="fas fa-money-bill payunsettled" title="Pay UNSETTLED" data-accid="${acc.id}"></i> `;
+            actions += `<i class="fas fa-money-bill payunsettled" title="Pay UNSETTLED" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
         if (acc.rules.length > 0)
-            actions += `${acc.rules.length} <i class="fas fa-download downrules" title="Download autorules" data-accid="${acc.id}"></i> `;
+            actions += `<span title="${acc.rules.map(rule=>rule.name).join('\n')}">${acc.rules.length}</span> <i class="fas fa-download downrules" title="Download autorules" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
         if (acc.status != 2)
-            actions += `<i class="fas fa-upload uprules" title="Upload autorules" data-accid="${acc.id}"></i> `;
+            actions += `<i class="fas fa-upload uprules" title="Upload autorules" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
         return actions;
     }
 
@@ -165,49 +166,55 @@ export class TableFormatter {
 
         const uploadRulesButtons = document.querySelectorAll('.uprules');
         uploadRulesButtons.forEach(button => {
-            button.addEventListener('click', (event) => {
+            button.addEventListener('click', async (event) => {
+                const socname = event.target.dataset.socname;
                 const accId = event.target.dataset.accid;
-                Actions.uploadRules(accId);
+                await Actions.uploadRules(socname, accId);
             });
         });
 
         const payButtons = document.querySelectorAll('.payUnsettled');
         payButtons.forEach(button => {
             button.addEventListener('click', (event) => {
+                const socname = event.target.dataset.socname;
                 const accId = event.target.dataset.accid;
-                Actions.payUnsettled(accId);
+                Actions.payUnsettled(socname, accId);
             });
         });
 
         const appealButton = document.querySelectorAll('.sendappeal');
         appealButton.forEach(button => {
             button.addEventListener('click', (event) => {
+                const socname = event.target.dataset.socname;
                 const accId = event.target.dataset.accid;
-                Actions.sendAccAppeal(accId);
+                Actions.sendAccAppeal(socname, accId);
             });
         });
 
         const startButton = document.querySelectorAll('.startad');
         startButton.forEach(button => {
             button.addEventListener('click', (event) => {
+                const socname = event.target.dataset.socname;
                 const adId = event.target.dataset.adid;
-                Actions.startAd(adId);
+                Actions.startAd(socname, adId);
             });
         });
 
         const stopButton = document.querySelectorAll('.stopad');
         stopButton.forEach(button => {
             button.addEventListener('click', (event) => {
+                const socname = event.target.dataset.socname;
                 const adId = event.target.dataset.adid;
-                Actions.stopAd(adId);
+                Actions.stopAd(socname, adId);
             });
         });
 
         const disapproveButton = document.querySelectorAll('.senddisapprove');
         disapproveButton.forEach(button => {
             button.addEventListener('click', (event) => {
+                const socname = event.target.dataset.socname;
                 const adId = event.target.dataset.adid;
-                Actions.sendAdAppeal(adId);
+                Actions.sendAdAppeal(socname, adId);
             });
         });
     }
