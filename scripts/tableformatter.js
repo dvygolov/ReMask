@@ -1,5 +1,6 @@
 import {account_statuses, disable_reasons} from "./constants.js";
 import {MathHelpers} from "./mathhelpers.js";
+import {Actions} from "./actions.js";
 
 export class TableFormatter {
     addTableHeader(parent) {
@@ -29,6 +30,7 @@ export class TableFormatter {
             if (!showAll) resAds = resAds.filter(ad => ad.isActive());
             resAds.forEach(ad => statBody.appendChild(this.createAdRow(ad)));
         });
+        this.addActions();
     }
 
     getAdStatusColor(status) {
@@ -116,7 +118,7 @@ export class TableFormatter {
     getAdActions(ad) {
         switch (ad.status) {
             case 'DISAPPROVED':
-                return `<i class="fas fa-paper-plane sendisapprove" title="Send appeal" data-adid="${ad.id}"></i>`;
+                return `<i class="fas fa-paper-plane senddisapprove" title="Send appeal" data-adid="${ad.id}"></i>`;
                 break;
             case 'PAUSED':
                 return `<i class="fas fa-play startad" title="Start ad" data-adid="${ad.id}"></i>`;
@@ -150,5 +152,63 @@ export class TableFormatter {
         } else {
             return "<td><h6 style='color: red;'>Thumbnail unavailable,<br/>ad deleted</h6></td>";
         }
+    }
+
+    addActions() {
+        const downloadRulesButtons = document.querySelectorAll('.downrules');
+        downloadRulesButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const accId = event.target.dataset.accid;
+                Actions.downloadRules(accId);
+            });
+        });
+
+        const uploadRulesButtons = document.querySelectorAll('.uprules');
+        uploadRulesButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const accId = event.target.dataset.accid;
+                Actions.uploadRules(accId);
+            });
+        });
+
+        const payButtons = document.querySelectorAll('.payUnsettled');
+        payButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const accId = event.target.dataset.accid;
+                Actions.payUnsettled(accId);
+            });
+        });
+
+        const appealButton = document.querySelectorAll('.sendappeal');
+        appealButton.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const accId = event.target.dataset.accid;
+                Actions.sendAccAppeal(accId);
+            });
+        });
+
+        const startButton = document.querySelectorAll('.startad');
+        startButton.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const adId = event.target.dataset.adid;
+                Actions.startAd(adId);
+            });
+        });
+
+        const stopButton = document.querySelectorAll('.stopad');
+        stopButton.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const adId = event.target.dataset.adid;
+                Actions.stopAd(adId);
+            });
+        });
+
+        const disapproveButton = document.querySelectorAll('.senddisapprove');
+        disapproveButton.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const adId = event.target.dataset.adid;
+                Actions.sendAdAppeal(adId);
+            });
+        });
     }
 }

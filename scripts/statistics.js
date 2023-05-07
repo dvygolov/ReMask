@@ -1,7 +1,6 @@
 import {TableFormatter} from "./tableformatter.js";
 import {Requests} from "./requests.js";
 import {AdAccount} from "./adaccount.js";
-import {Actions} from "./actions.js";
 
 export async function loadAllStatistics() {
     let datetime = document.getElementById('dateRange').value;
@@ -14,16 +13,6 @@ export async function loadAllStatistics() {
     window.adAcounts = allAccs.flat();
     const tf = new TableFormatter();
     tf.formatAdAccounts(window.adAcounts);
-
-    const downloadRulesButtons = document.querySelectorAll('.downrules');
-
-    downloadRulesButtons.forEach(button => {
-        button.addEventListener('click', (event) => {
-            const accId = event.target.dataset.accid;
-            Actions.downloadRules(accId);
-        });
-    });
-
 }
 
 async function load(accName, datetime) {
