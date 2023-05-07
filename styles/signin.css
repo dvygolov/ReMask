@@ -158,3 +158,6 @@ select, option {
 	word-break: break-all;
 	padding-left: 15px;
 }
+.fas {
+  cursor: pointer;
+}

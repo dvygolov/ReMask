@@ -10,8 +10,9 @@ export async function loadAllStatistics() {
         : [accNamesSelect.value];
 
     const allAccs = await Promise.all(selectedAccounts.map(aName => load(aName, datetime)));
+    window.adAcounts = allAccs.flat();
     const tf = new TableFormatter();
-    tf.formatAdAccounts(allAccs.flat());
+    tf.formatAdAccounts(window.adAcounts);
 }
 
 async function load(accName, datetime) {

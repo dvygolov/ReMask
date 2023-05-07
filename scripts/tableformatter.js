@@ -46,7 +46,9 @@ export class TableFormatter {
 
     createAdRow(ad) {
         const imageCell = this.getImageCell(ad.imageUrl, ad.thumbUrl);
-        const name = ad.link ? `<a href='${ad.link}' target='_blank'>${ad.name}</a>` : ad.name;
+        let link = ad.link;
+        if (ad.urlparams) link +=ad.urlparams;
+        const name = ad.link ? `<a href='${link}' target='_blank'>${ad.name}</a>` : ad.name;
         const esColor = this.getAdStatusColor(ad.status);
         const tdArray = [
             imageCell,
@@ -82,7 +84,14 @@ export class TableFormatter {
         const disableReasonText = `<span style="color:${drcolor}">${disable_reasons[acc.disable_reason]}</span>`;
 
         const accountInfo = `${acc.name} - ${acc.spendlimit}/${acc.billing}/${acc.curspend}`;
-        const popupInfo = `ID: ${acc.id}<br>Pixel: ${acc.pixelid}<br> Card: ${acc.cardinfo}`;
+        const popupInfo = `
+            ID: ${acc.id}<br>
+            Pixel: ${acc.pixelid}<br> 
+            Card: ${acc.cardinfo}<br/> 
+            Currency: ${acc.currency}<br/> 
+            Total spend: ${acc.totalspend}<br/>
+            Time zone: ${acc.timezone}<br/>
+            Created: ${acc.createdtime}`;
         let actions = this.getAccActions(acc);
         const rowData = `
         <td colspan="2" style="text-align:left;padding-left:15px;">
@@ -100,13 +109,13 @@ export class TableFormatter {
     getAdActions(ad) {
         switch (ad.status) {
             case 'DISAPPROVED':
-                return '<i class="fas fa-paper-plane" title="Send appeal" onclick="Actions.sendAdAppeal(ad);"></i>';
+                return `<i class="fas fa-paper-plane" title="Send appeal" onclick="Actions.sendAdAppeal(${ad.id});"></i>`;
                 break;
             case 'PAUSED':
-                return '<i class="fas fa-play" title="Start ad" onclick="Actions.startAd(ad);"></i>';
+                return `<i class="fas fa-play" title="Start ad" onclick="Actions.startAd(${ad.id});"></i>`;
                 break;
             case 'ACTIVE':
-                return '<i class="fas fa-stop" title="Stop ad" onclick="Actions.stopAd(ad);"></i>';
+                return `<i class="fas fa-stop" title="Stop ad" onclick="Actions.stopAd(${ad.id});"></i>`;
                 break;
             default:
                 return '';
@@ -116,13 +125,13 @@ export class TableFormatter {
     getAccActions(acc) {
         let actions = "";
         if (acc.status == 2 && acc.disable_reason == 1) // DISABLED ADS_INTEGRITY_POLICY
-            actions += '<i class="fas fa-paper-plane" title="Send appeal" onclick="Actions.sendAccAppeal(acc);"></i> ';
+            actions += `<i class="fas fa-paper-plane" title="Send appeal" onclick="Actions.sendAccAppeal(${acc.id});"></i> `;
         else if (acc.status == 3) //UNSETTLED
-            actions += '<i class="fas fa-money-bill" title="Pay UNSETTLED" onclick="Actions.payUnsettled(acc);"></i> ';
+            actions += `<i class="fas fa-money-bill" title="Pay UNSETTLED" onclick="Actions.payUnsettled(${acc.id});"></i> `;
         if (acc.rules.length > 0)
-            actions += `${acc.rules.length} <i class="fas fa-download" title="Download autorules" onclick="Actions.downloadRules(acc);"></i> `;
+            actions += `${acc.rules.length} <i class="fas fa-download" title="Download autorules" onclick="Actions.downloadRules(${acc.id});"></i> `;
         if (acc.status != 2)
-            actions += '<i class="fas fa-upload" title="Upload autorules" onclick="Actions.uploadRules(acc);"></i> ';
+            actions += `<i class="fas fa-upload" title="Upload autorules" onclick="Actions.uploadRules(${acc.id});"></i> `;
         return actions;
     }
 

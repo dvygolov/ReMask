@@ -67,6 +67,7 @@ ads.date_preset($datetime).time_increment($datetime).limit(500){
             link_data{link},
             page_id
         },
+        url_tags,
         image_crops,
         image_url,
         status,

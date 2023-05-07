@@ -19,6 +19,7 @@ export class Ad {
         this.imageUrl = this.adcreative.image_url || '';
         this.thumbUrl = this.adcreative.thumbnail_url || '';
         this.link = this.adcreative.object_story_spec?.link_data?.link || '';
+        this.urlparams = this.adcreative.url_tags || '';
     }
 
     isActive() {
