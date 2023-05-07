@@ -22,16 +22,27 @@ export class AdAccount {
         this.ads = accountData.ads ? accountData.ads.data.map(adData => new Ad(adData)) : [];
         this.createdtime = accountData.created_time;
         this.rules = accountData.adrules_library?.data ?? [];
+
         this.totalStats = {
-            tImpressions: 0,
-            tClicks: 0,
-            tResult: 0,
-            tSpent: 0,
-            tCPL: [],
-            tCPM: [],
-            tCTR: [],
-            tCPC: []
+            results: 0,
+            CPA: [],
+            spend: 0,
+            clicks: 0,
+            CPC: [],
+            CTR: [],
+            impressions: 0,
+            CPM: []
         };
+        this.ads.forEach((ad) => {
+            this.totalStats.results += ad.results;
+            this.totalStats.CPA.push(ad.CPA);
+            this.totalStats.spend += ad.spend;
+            this.totalStats.clicks += ad.clicks;
+            this.totalStats.CPC.push(ad.CPC);
+            this.totalStats.CTR.push(ad.CTR);
+            this.totalStats.impressions += ad.impressions;
+            this.totalStats.CPM.push(ad.CPM);
+        });
     }
 
     isActive() {

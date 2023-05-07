@@ -1,2 +1,2 @@
 <?php
-echo "ReMask Panel ver: 0.2";
+echo "ReMask Panel ver:0.5";

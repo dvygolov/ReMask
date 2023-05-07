@@ -1,5 +1,5 @@
 import {account_statuses, disable_reasons} from "./constants.js";
-import {Actions} from "./actions.js";
+import {MathHelpers} from "./mathhelpers.js";
 
 export class TableFormatter {
     addTableHeader(parent) {
@@ -44,35 +44,6 @@ export class TableFormatter {
         }
     }
 
-    createAdRow(ad) {
-        const imageCell = this.getImageCell(ad.imageUrl, ad.thumbUrl);
-        let link = ad.link;
-        if (ad.urlparams) link +=ad.urlparams;
-        const name = ad.link ? `<a href='${link}' target='_blank'>${ad.name}</a>` : ad.name;
-        const esColor = this.getAdStatusColor(ad.status);
-        const tdArray = [
-            imageCell,
-            `<nobr>${name}</nobr>`,
-            `${this.getAdActions(ad)}`,
-            `<p style="color:${esColor};">${ad.status}<br/> ${ad.reviewFeedback}</p>`,
-            `<nobr>${ad.impressions}</nobr>`,
-            `<nobr>${ad.clicks}</nobr>`,
-            `<nobr>${ad.results}</nobr>`,
-            `<nobr>${ad.adspent}</nobr>`,
-            `<nobr>${ad.cpl}</nobr>`,
-            `<nobr>${ad.cpm}</nobr>`,
-            `<nobr>${ad.ctr}</nobr>`,
-            `<nobr>${ad.cpc}</nobr>`
-        ];
-        const tr = document.createElement('tr');
-        for (const tdContent of tdArray) {
-            const td = document.createElement('td');
-            td.innerHTML = tdContent;
-            tr.appendChild(td);
-        }
-        return tr;
-    }
-
     createAccountRow(acc) {
         const tr = document.createElement('tr');
         tr.id = acc.id;
@@ -99,23 +70,59 @@ export class TableFormatter {
         </td>
         <td> ${actions} </td>
         <td><b>${accountStatusText}<br/>${disableReasonText}</b></td>
-        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>`;
+        <td><b>${acc.totalStats.results}</b></td>
+        <td><b>${MathHelpers.average(acc.totalStats.CPA)}</b></td>
+        <td><b>${acc.totalStats.spend}</b></td>
+        <td><b>${acc.totalStats.clicks}</b></td>
+        <td><b>${MathHelpers.average(acc.totalStats.CPC)}</b></td>
+        <td><b>${MathHelpers.average(acc.totalStats.CTR)}%</b></td>
+        <td><b>${acc.totalStats.impressions}</b></td>
+        <td><b>${MathHelpers.average(acc.totalStats.CPM)}</b></td>`;
 
         tr.style = 'box-shadow: rgba(15, 17, 19, 0.63) 0px 0px 20px 2px;';
         tr.innerHTML = rowData;
         return tr;
     }
+    createAdRow(ad) {
+        const imageCell = this.getImageCell(ad.imageUrl, ad.thumbUrl);
+        let link = ad.link;
+        if (ad.urlparams) link += ad.urlparams;
+        const name = ad.link ? `<a href='${link}' target='_blank'>${ad.name}</a>` : ad.name;
+        const esColor = this.getAdStatusColor(ad.status);
+        const tdArray = [
+            imageCell,
+            `<nobr>${name}</nobr>`,
+            `${this.getAdActions(ad)}`,
+            `<p style="color:${esColor};">${ad.status}<br/> ${ad.reviewFeedback}</p>`,
+            `<nobr>${ad.results}</nobr>`,
+            `<nobr>${ad.CPL}</nobr>`,
+            `<nobr>${ad.spend}</nobr>`,
+            `<nobr>${ad.clicks}</nobr>`,
+            `<nobr>${ad.CPC}</nobr>`,
+            `<nobr>${ad.CTR}%</nobr>`,
+            `<nobr>${ad.impressions}</nobr>`,
+            `<nobr>${ad.CPM}</nobr>`
+        ];
+        const tr = document.createElement('tr');
+        for (const tdContent of tdArray) {
+            const td = document.createElement('td');
+            td.innerHTML = tdContent;
+            tr.appendChild(td);
+        }
+        return tr;
+    }
+
 
     getAdActions(ad) {
         switch (ad.status) {
             case 'DISAPPROVED':
-                return `<i class="fas fa-paper-plane" title="Send appeal" onclick="Actions.sendAdAppeal(${ad.id});"></i>`;
+                return `<i class="fas fa-paper-plane sendisapprove" title="Send appeal" data-adid="${ad.id}"></i>`;
                 break;
             case 'PAUSED':
-                return `<i class="fas fa-play" title="Start ad" onclick="Actions.startAd(${ad.id});"></i>`;
+                return `<i class="fas fa-play startad" title="Start ad" data-adid="${ad.id}"></i>`;
                 break;
             case 'ACTIVE':
-                return `<i class="fas fa-stop" title="Stop ad" onclick="Actions.stopAd(${ad.id});"></i>`;
+                return `<i class="fas fa-stop stopad" title="Stop ad" data-adid="${ad.id}"></i>`;
                 break;
             default:
                 return '';
@@ -125,13 +132,13 @@ export class TableFormatter {
     getAccActions(acc) {
         let actions = "";
         if (acc.status == 2 && acc.disable_reason == 1) // DISABLED ADS_INTEGRITY_POLICY
-            actions += `<i class="fas fa-paper-plane" title="Send appeal" onclick="Actions.sendAccAppeal(${acc.id});"></i> `;
+            actions += `<i class="fas fa-paper-plane sendappeal" title="Send appeal" data-accid="${acc.id}"></i> `;
         else if (acc.status == 3) //UNSETTLED
-            actions += `<i class="fas fa-money-bill" title="Pay UNSETTLED" onclick="Actions.payUnsettled(${acc.id});"></i> `;
+            actions += `<i class="fas fa-money-bill payunsettled" title="Pay UNSETTLED" data-accid="${acc.id}"></i> `;
         if (acc.rules.length > 0)
-            actions += `${acc.rules.length} <i class="fas fa-download" title="Download autorules" onclick="Actions.downloadRules(${acc.id});"></i> `;
+            actions += `${acc.rules.length} <i class="fas fa-download downrules" title="Download autorules" data-accid="${acc.id}"></i> `;
         if (acc.status != 2)
-            actions += `<i class="fas fa-upload" title="Upload autorules" onclick="Actions.uploadRules(${acc.id});"></i> `;
+            actions += `<i class="fas fa-upload uprules" title="Upload autorules" data-accid="${acc.id}"></i> `;
         return actions;
     }
 

@@ -1,18 +1,17 @@
 export class MathHelpers {
     static average(arr) {
-        var x, correctFactor = 0,
-            sum = 0;
-        for (x = 0; x < arr.length; x++) {
-            arr[x] = +arr[x];
-            if (!isNaN(arr[x])) {
-                sum += arr[x];
-            } else {
-                correctFactor++;
-            }
+        const validNumbers = arr
+            .map(Number)
+            .filter(num => !isNaN(num));
+
+        if (validNumbers.length === 0) {
+            return 0;
         }
-        sum = (sum / (arr.length - correctFactor)).toFixed(2);
-        if (isNaN(sum)) sum = 0;
-        return sum;
+
+        const sum = validNumbers.reduce((acc, num) => acc + num, 0);
+        const avg = (sum / validNumbers.length).toFixed(2);
+
+        return parseFloat(avg);
     }
 
     static mathMoney(num) {
