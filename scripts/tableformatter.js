@@ -161,7 +161,12 @@ export class TableFormatter {
         downloadRulesButtons.forEach(button => {
             button.addEventListener('click', (event) => {
                 const accId = event.target.dataset.accid;
+                const originalClassNames = event.target.className;
+                event.target.className = ' fas fa-spinner fa-spin';
+                event.target.disabled = true;
                 Actions.downloadRules(accId);
+                event.target.className = originalClassNames;
+                event.target.disabled = false;
             });
         });
 
@@ -170,7 +175,12 @@ export class TableFormatter {
             button.addEventListener('click', async (event) => {
                 const socname = event.target.dataset.socname;
                 const accId = event.target.dataset.accid;
+                const originalClassNames = event.target.className;
+                event.target.className = ' fas fa-spinner fa-spin';
+                event.target.disabled = true;
                 await Actions.uploadRules(socname, accId);
+                event.target.className = originalClassNames;
+                event.target.disabled = false;
             });
         });
 
@@ -179,7 +189,12 @@ export class TableFormatter {
             button.addEventListener('click', async (event) => {
                 const socname = event.target.dataset.socname;
                 const accId = event.target.dataset.accid;
+                const originalClassNames = event.target.className;
+                event.target.className = ' fas fa-spinner fa-spin';
+                event.target.disabled = true;
                 await Actions.payUnsettled(socname, accId);
+                event.target.className = originalClassNames;
+                event.target.disabled = false;
             });
         });
 
@@ -190,11 +205,9 @@ export class TableFormatter {
                 const accId = event.target.dataset.accid;
 
                 const originalClassNames = event.target.className;
-                // Add the loading-icon classes
                 event.target.className = ' fas fa-spinner fa-spin';
-
+                event.target.disabled = true;
                 await Actions.sendAccAppeal(socname, accId);
-
                 event.target.className = originalClassNames;
                 event.target.disabled = false;
             });
@@ -205,7 +218,13 @@ export class TableFormatter {
             button.addEventListener('click', async (event) => {
                 const socname = event.target.dataset.socname;
                 const adId = event.target.dataset.adid;
+
+                const originalClassNames = event.target.className;
+                event.target.className = ' fas fa-spinner fa-spin';
+                event.target.disabled = true;
                 await Actions.startAd(socname, adId);
+                event.target.className = originalClassNames;
+                event.target.disabled = false;
             });
         });
 
@@ -214,7 +233,12 @@ export class TableFormatter {
             button.addEventListener('click', async (event) => {
                 const socname = event.target.dataset.socname;
                 const adId = event.target.dataset.adid;
+                const originalClassNames = event.target.className;
+                event.target.className = ' fas fa-spinner fa-spin';
+                event.target.disabled = true;
                 await Actions.stopAd(socname, adId)
+                event.target.className = originalClassNames;
+                event.target.disabled = false;
             });
         });
 
@@ -224,13 +248,11 @@ export class TableFormatter {
                 const socname = event.target.dataset.socname;
                 const adId = event.target.dataset.adid;
 
-                const originalContent = event.target.innerHTML;
-                event.target.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                const originalClassNames = event.target.className;
+                event.target.className = ' fas fa-spinner fa-spin';
                 event.target.disabled = true;
-
                 await Actions.sendAdAppeal(socname, adId);
-
-                event.target.innerHTML = originalContent;
+                event.target.className = originalClassNames;
                 event.target.disabled = false;
             });
         });
