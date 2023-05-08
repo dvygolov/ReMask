@@ -1,15 +1,41 @@
 export class Requests {
-    async fetchData(accName, datetime) {
+    static async fetchData(accName, datetime) {
         let url = `/ajax/getAccountStatistics.php?acc_name=${accName}&datetime=${datetime}`;
-        try {
-            let response = await fetch(url);
-            let json = await response.json();
-            if (response.status === 200 & !json.error) return json;
-            if (typeof json.error === 'object')
-                json.error = JSON.stringify(json.error);
-            alert(`Error getting statistics for account:${accName}\n${json.error}`);
-        } catch (error) {
-            alert(`Error fetching data for account:${accName}\n${error}`);
+        let resp = await fetch(url);
+        let checkRes = await this.checkResponse(resp);
+        if (checkRes.success) return checkRes.data;
+        alert(checkRes.error);
+        return null;
+    }
+
+    static async post(url, body) {
+        return await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: body
+        });
+    }
+
+    static async checkResponse(resp, getBody=true) {
+        if (resp.status === 200) {
+            if (!getBody) return {success:true};
+            let t = await resp.text();
+            let json;
+            try {
+                json = JSON.parse(t);
+            } catch {
+                return {success: false, error: `Error parsing response JSON: ${t}`};
+            }
+            if (json.error) {
+                if (typeof json.error === 'object')
+                    json.error = JSON.stringify(json.error);
+                return {success: false, error: `Got error: ${json.error}!`};
+            }
+            return {success: true, data: json};
+        } else {
+            return {success: false, error: `Got error ${resp.status} from the server!`};
         }
     }
 }

@@ -27,6 +27,24 @@ class FbRequests
         return $this->execute($optArray);
     }
 
+    public function Post(FbAccount $acc, string $url, string $body): array
+    {
+        $finalUrl = $this->api . $url;
+        $finalBody = $body . "&access_token=" . $acc->token;
+
+        $optArray = array(
+            CURLOPT_URL => $finalUrl,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true, // Set the request method to POST
+            CURLOPT_POSTFIELDS => $finalBody, // Set the POST data
+            CURLOPT_COOKIE => $acc->getCurlCookies(),
+        );
+
+        $acc->proxy?->AddToCurlOptions($optArray);
+
+        return $this->execute($optArray);
+    }
+
     public function GetDtsg(FbAccount $acc)
     {
         $headers = [

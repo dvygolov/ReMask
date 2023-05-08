@@ -1,26 +1,68 @@
+import {Requests} from './requests.js';
+
+window.addEventListener('DOMContentLoaded', () => {
+    const delAccButton = document.querySelectorAll('.delaccount');
+    delAccButton.forEach(button => {
+        button.addEventListener('click', async (event) => {
+            const socname = event.target.dataset.name;
+            await delAccount(socname);
+        });
+    });
+
+    const editAccButton = document.querySelectorAll('.editaccount');
+    editAccButton.forEach(button => {
+        button.addEventListener('click', async (event) => {
+            const socname = event.target.dataset.name;
+            await editAccount(socname);
+        });
+    });
+
+    const addAccountButton = document.getElementById("addaccountbutton");
+    addAccountButton.addEventListener('click', async (event) => {
+        await addAccount();
+    });
+});
+
 async function addAccount() {
     const name = document.add.name.value;
     const token = document.add.token.value;
     const cookies = document.add.cookies.value;
     const proxy = document.add.proxy.value;
-    if (!await validate_form(name,token,cookies,proxy)) return;
-    let resp = await fetch("ajax/addAccount.php", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: `name=${encodeURIComponent(name)}&token=${encodeURIComponent(token)}&cookies=${encodeURIComponent(cookies)}&proxy=${encodeURIComponent(proxy)}`,
-    });
-    window.location.reload();
+    if (!await validate_form(name, token, cookies, proxy)) return;
+    let resp = await Requests.post("ajax/addAccount.php",
+        `name=${encodeURIComponent(name)}&token=${encodeURIComponent(token)}&cookies=${encodeURIComponent(cookies)}&proxy=${encodeURIComponent(proxy)}`
+    );
+    let checkResp = await Requests.checkResponse(resp, false);
+    if (checkResp.success)
+        window.location.reload();
+    else alert(`Error adding account: ${checkResp.error}`);
+}
+
+async function editAccount(name) {
+    let resp = await fetch(`ajax/editAccount.php?name=${name}`);
+    let checkResp = await Requests.checkResponse(resp);
+    if (checkResp.success) {
+        document.add.name.value = checkResp.data.name;
+        document.add.name.readonly = true;
+        document.add.token.value = checkResp.data.token;
+        document.add.cookies.value = JSON.stringify(checkResp.data.cookies);
+        // Convert the proxy JSON object to a colon-separated string
+        const proxyObj = checkResp.data.proxy;
+        const proxyStr = `${proxyObj.type}:${proxyObj.ip}:${proxyObj.port}:${proxyObj.login}:${proxyObj.password}`;
+        document.add.proxy.value = proxyStr;
+    } else alert(`Error editing account: ${checkResp.error}`);
 }
 
 async function delAccount(name) {
     let resp = await fetch(`ajax/delAccount.php?name=${name}`);
-    window.location.reload();
+    let checkResp = await Requests.checkResponse(resp, false);
+    if (checkResp.success)
+        window.location.reload();
+    else alert(`Error deleting account: ${checkResp.error}`);
 }
 
-async function validate_form(name,token,cookies,proxy) {
-    if (name === "" || token === "" || cookies === "") {
+async function validate_form(name, token, cookies, proxy) {
+    if (name === "" || token === "" || cookies === "" || proxy === "") {
         alert("You need to fill ALL fields!");
         return false;
     }
@@ -59,38 +101,27 @@ async function validate_form(name,token,cookies,proxy) {
     }
 
     const proxyElements = proxy.split(':');
-    if (proxyElements.length !== 4) {
-        alert("Proxy must be in the format 'ip:port:login:pass'!");
+    if (proxyElements.length !== 5) {
+        alert("Proxy must be in the format 'type:ip:port:login:pass'!");
         return false;
     }
 
-    let resp = await fetch("ajax/checkAccount.php", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: `name=${encodeURIComponent(name)}&token=${encodeURIComponent(token)}&cookies=${encodeURIComponent(cookies)}&proxy=${encodeURIComponent(proxy)}`,
-    });
-    if (resp.status === 200) {
-        let t = await resp.text();
-        let json;
-        try{
-           json = JSON.parse(t);
-        }
-        catch{
-           alert(`Error parsing response JSON: ${t}`);
-           return false;
-        }
-        if (json.error){
-            if (typeof json.error === 'object')
-                json.error = JSON.stringify(json.error);
-            alert(`Got error: ${json.error}!`);
-            return false;
-        }
-        return true;
-    } else {
-        alert(`Got error ${resp.status} from the server!`);
+    const proxyType = proxyElements[0].toLowerCase();
+    if (proxyType !== 'http' && proxyType !== 'socks') {
+        alert("Proxy type must be either 'http' or 'socks'!");
         return false;
     }
+
+    let resp = await Requests.post(
+        "ajax/checkAccount.php",
+        `name=${encodeURIComponent(name)}&token=${encodeURIComponent(token)}&cookies=${encodeURIComponent(cookies)}&proxy=${encodeURIComponent(proxy)}`
+    );
+    let checkResp = await Requests.checkResponse(resp);
+    if (!checkResp.success)
+    {
+        alert(`Error checking account: ${checkResp.error}`);
+        return false;
+    }
+
     return true;
 }

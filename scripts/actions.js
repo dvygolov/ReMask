@@ -1,3 +1,5 @@
+import {Requests} from "./requests.js";
+
 export class Actions {
     static sendAdAppeal(socname, adId) {
     }
@@ -40,7 +42,6 @@ export class Actions {
         setTimeout(() => URL.revokeObjectURL(link.href), 100);
     }
 
-
     static async uploadRules(socname, accId) {
         const fileInput = document.createElement("input");
         fileInput.type = "file";
@@ -74,23 +75,14 @@ export class Actions {
     }
 
     static async sendRulesToServer(socname, accId, jsonString) {
-        try {
-            const response = await fetch("ajax/uploadRules.php", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: `acc_name=${encodeURIComponent(socname)}&accid=${encodeURIComponent(accId)}&rules=${encodeURIComponent(jsonString)}`
-            });
-
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-
-            const responseData = await response.json();
+        const resp = Requests.post(
+            "ajax/uploadRules.php",
+            `acc_name=${encodeURIComponent(socname)}&accid=${encodeURIComponent(accId)}&rules=${encodeURIComponent(jsonString)}`
+        );
+        let checkRes = await Requests.checkResponse(resp);
+        if (checkRes.success)
             alert("Rules uploaded successfully!");
-        } catch (error) {
-            alert("Error while sending rules to server:" + error);
-        }
+        else
+            alert(`Error uploading rules: ${checkRes.error}`);
     }
 }

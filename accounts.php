@@ -19,7 +19,7 @@ $accounts = $serializer->deserialize();
     <link href="styles/signin.css" rel="stylesheet"/>
     <link rel="icon" type="image/png" href="styles/img/favicon.png">
     <script src="styles/bootstrap.min.js"></script>
-    <script src="scripts/accounts.js"></script>
+    <script src="scripts/accounts.js" type="module"></script>
     <title><?php include 'version.php' ?></title>
 </head>
 <body class="text-center">
@@ -31,8 +31,12 @@ $accounts = $serializer->deserialize();
     <?php for ($i = 0; $i < count($accounts); $i++) { ?>
         <TR>
             <TD class='nameclmn'><?= $accounts[$i]->name ?></TD>
-            <TD class='tokenclmn'><?= $accounts[$i]->token ?></TD>
-            <TD><a href="#" onclick="delAccount('<?= $accounts[$i]->name ?>')">[Delete]</a></TD>
+            <TD style="margin-left: 10px;">
+                <a href="#" class="editaccount" data-name="<?= $accounts[$i]->name ?>">[Edit]</a>
+            </TD>
+            <TD style="margin-left: 10px;">
+                <a href="#" class="delaccount" data-name="<?= $accounts[$i]->name ?>">[Delete]</a>
+            </TD>
         </TR>
     <?php } ?>
     </tbody>
@@ -42,13 +46,48 @@ $accounts = $serializer->deserialize();
 <b style="color:#c8ccd6">Add Account</b>
 <br/>
 <br/>
-<form name="add">
-    <input name="name" type="text" class="form-control" value="" placeholder="Name"/>
-    <input name="token" type="text" class="form-control" value="" placeholder="Token"/>
-    <input name="cookies" type="text" class="form-control" value="" placeholder="JSON-cookies"/>
-    <input name="proxy" type="text" class="form-control" value="" placeholder="Proxy ip:port:login:pass"/>
-    <input type="button" onclick="addAccount()" name="additem" class="btn btn-primary" value="Add!"/>
-</form>
+<style>
+    .form-container {
+        display: grid;
+        grid-template-columns: auto auto;
+        column-gap: 10px;
+        align-items: center;
+    }
+
+    label {
+        text-align: right;
+        padding-right: 10px;
+        color: white;
+    }
+
+    .form-wrapper {
+        display: flex;
+        justify-content: center;
+    }
+
+    input[name="additem"] {
+        margin-top: 10px;
+    }
+</style>
+
+<div class="form-wrapper">
+    <form name="add" class="form-container">
+        <label for="name">Name:</label>
+        <input name="name" type="text" class="form-control" value="" placeholder="John Doe" />
+
+        <label for="token">Token:</label>
+        <input name="token" type="text" class="form-control" value="" placeholder="EAAB...." />
+
+        <label for="cookies">Cookies:</label>
+        <input name="cookies" type="text" class="form-control" value="" placeholder="in JSON format" />
+
+        <label for="proxy">Proxy:</label>
+        <input name="proxy" type="text" class="form-control" value="" placeholder="type:ip:port:login:pass" />
+
+        <div></div>
+        <input type="button" id="addaccountbutton" class="btn btn-primary" value="Add!" />
+    </form>
+</div>
 <br/>
 <?= include 'copyright.php' ?>
 </body>

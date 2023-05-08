@@ -53,7 +53,7 @@ $accounts = $serializer->deserialize();
 <table class="table table-dark table-hover" style="font-size: 16px;">
     <tbody id="statBody"></tbody>
 </table>
-<script src="scripts/main.js" type="module"></script>
+<script src="scripts/index.js" type="module"></script>
 <div id='message'></div>
 <?= include 'copyright.php' ?>
 </body>
