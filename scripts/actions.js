@@ -10,7 +10,16 @@ export class Actions {
     static stopAd(socname, adId) {
     }
 
-    static sendAccAppeal(socname, accId) {
+    static async sendAccAppeal(socname, accId) {
+        const resp = await Requests.post(
+            "ajax/policyAppeal.php",
+            `acc_name=${encodeURIComponent(socname)}&accid=${encodeURIComponent(accId)}`
+        );
+        let checkRes = await Requests.checkResponse(resp);
+        if (checkRes.success)
+            alert("Appeal successfully sent!");
+        else
+            alert(`Error sending appeal: ${checkRes.error}`);
     }
 
     static payUnsettled(socname, accId) {

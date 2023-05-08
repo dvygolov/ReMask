@@ -24,7 +24,7 @@ foreach ($rules as $rule) {
     $batchItem = [
         'name' => $rule['name'],
         'method' => 'POST',
-        'body' => "evaluation_spec={$evspecstr}&execution_spec={$exspecstr}&locale=ru_RU&name={$rule['name']}&schedule_spec={$shedspecstr}&status=ENABLED",
+        'body' => "name={$rule['name']}&evaluation_spec={$evspecstr}&execution_spec={$exspecstr}&schedule_spec={$shedspecstr}&status=ENABLED",
         'relative_url' => "act_{$accId}/adrules_library"
     ];
 

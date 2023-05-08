@@ -29,7 +29,15 @@ class FbRequests
 
     public function Post(FbAccount $acc, string $url, string $body): array
     {
-        $finalUrl = $this->api . $url;
+        $headers = [
+            "content-type: application/x-www-form-urlencoded",
+            "sec-ch-ua-mobile: ?0",
+            'sec-ch-ua-platform: "Windows"',
+            "sec-fetch-dest: empty",
+            "sec-fetch-mode: cors",
+            "sec-fetch-site: same-origin",
+        ];
+        $finalUrl = $customUrl == null ? $this->api . $url : $customUrl . $url;
         $finalBody = $body . "&access_token=" . $acc->token;
 
         $optArray = array(
@@ -38,6 +46,7 @@ class FbRequests
             CURLOPT_POST => true, // Set the request method to POST
             CURLOPT_POSTFIELDS => $finalBody, // Set the POST data
             CURLOPT_COOKIE => $acc->getCurlCookies(),
+            CURLOPT_HTTPHEADER => $headers,
         );
 
         $acc->proxy?->AddToCurlOptions($optArray);
@@ -45,7 +54,32 @@ class FbRequests
         return $this->execute($optArray);
     }
 
-    public function GetDtsg(FbAccount $acc)
+    public function PrivatePost($acc, $body): array
+    {
+        $headers = [
+            "content-type: application/x-www-form-urlencoded",
+            "sec-ch-ua-mobile: ?0",
+            'sec-ch-ua-platform: "Windows"',
+            "sec-fetch-dest: empty",
+            "sec-fetch-mode: cors",
+            "sec-fetch-site: same-origin",
+        ];
+
+        $optArray = array(
+            CURLOPT_URL => "https://www.facebook.com/api/graphql",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true, // Set the request method to POST
+            CURLOPT_POSTFIELDS => $body, // Set the POST data
+            CURLOPT_COOKIE => $acc->getCurlCookies(),
+            CURLOPT_HTTPHEADER => $headers,
+        );
+
+        $acc->proxy?->AddToCurlOptions($optArray);
+
+        return $this->execute($optArray);
+    }
+
+    public function GetDtsg(FbAccount $acc): ?string
     {
         $headers = [
             "sec-fetch-dest: document",
@@ -59,7 +93,7 @@ class FbRequests
             CURLOPT_COOKIE => $acc->getCurlCookies(),
             CURLOPT_HTTPHEADER => $headers,
         );
-        $response = execute($optArray);
+        $response = $this->execute($optArray);
 
         $pattern = '/name="fb_dtsg"\s+value="([^"]+)"/';
         if (preg_match($pattern, $response["res"], $matches)) {

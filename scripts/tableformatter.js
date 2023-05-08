@@ -28,7 +28,7 @@ export class TableFormatter {
             statBody.appendChild(this.createAccountRow(acc, showAll));
             let resAds = acc.ads;
             if (!showAll) resAds = resAds.filter(ad => ad.isActive());
-            resAds.forEach(ad => statBody.appendChild(this.createAdRow(acc,ad)));
+            resAds.forEach(ad => statBody.appendChild(this.createAdRow(acc, ad)));
         });
         this.addActions();
     }
@@ -95,7 +95,7 @@ export class TableFormatter {
         const tdArray = [
             imageCell,
             `<nobr>${name}</nobr>`,
-            `${this.getAdActions(acc,ad)}`,
+            `${this.getAdActions(acc, ad)}`,
             `<p style="color:${esColor};">${ad.status}<br/> ${ad.reviewFeedback}</p>`,
             `<nobr>${ad.results}</nobr>`,
             `<nobr>${ad.CPL}</nobr>`,
@@ -123,13 +123,13 @@ export class TableFormatter {
         else if (acc.status == 3) //UNSETTLED
             actions += `<i class="fas fa-money-bill payunsettled" title="Pay UNSETTLED" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
         if (acc.rules.length > 0)
-            actions += `<span title="${acc.rules.map(rule=>rule.name).join('\n')}">${acc.rules.length}</span> <i class="fas fa-download downrules" title="Download autorules" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
+            actions += `<span title="${acc.rules.map(rule => rule.name).join('\n')}">${acc.rules.length}</span> <i class="fas fa-download downrules" title="Download autorules" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
         if (acc.status != 2)
             actions += `<i class="fas fa-upload uprules" title="Upload autorules" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
         return actions;
     }
 
-    getAdActions(acc,ad) {
+    getAdActions(acc, ad) {
         if (acc.status == 2) return ''; //When acc DISABLED = no actions for ads
         switch (ad.status) {
             case 'DISAPPROVED':
@@ -145,6 +145,7 @@ export class TableFormatter {
                 return '';
         }
     }
+
     getImageCell(fullImageUrl, thumbnailUrl) {
         if (fullImageUrl) {
             return `<td><a href='${fullImageUrl}' target='_blank'><img src='${thumbnailUrl}' width='50' height='50'></a></td>`;
@@ -175,46 +176,62 @@ export class TableFormatter {
 
         const payButtons = document.querySelectorAll('.payUnsettled');
         payButtons.forEach(button => {
-            button.addEventListener('click', (event) => {
+            button.addEventListener('click', async (event) => {
                 const socname = event.target.dataset.socname;
                 const accId = event.target.dataset.accid;
-                Actions.payUnsettled(socname, accId);
+                await Actions.payUnsettled(socname, accId);
             });
         });
 
         const appealButton = document.querySelectorAll('.sendappeal');
         appealButton.forEach(button => {
-            button.addEventListener('click', (event) => {
+            button.addEventListener('click', async (event) => {
                 const socname = event.target.dataset.socname;
                 const accId = event.target.dataset.accid;
-                Actions.sendAccAppeal(socname, accId);
+
+                const originalContent = event.target.innerHTML;
+                event.target.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                event.target.disabled = true;
+
+                await Actions.sendAccAppeal(socname, accId);
+
+                event.target.innerHTML = originalContent;
+                event.target.disabled = false;
             });
         });
 
         const startButton = document.querySelectorAll('.startad');
         startButton.forEach(button => {
-            button.addEventListener('click', (event) => {
+            button.addEventListener('click', async (event) => {
                 const socname = event.target.dataset.socname;
                 const adId = event.target.dataset.adid;
-                Actions.startAd(socname, adId);
+                await Actions.startAd(socname, adId);
             });
         });
 
         const stopButton = document.querySelectorAll('.stopad');
         stopButton.forEach(button => {
-            button.addEventListener('click', (event) => {
+            button.addEventListener('click', async (event) => {
                 const socname = event.target.dataset.socname;
                 const adId = event.target.dataset.adid;
-                Actions.stopAd(socname, adId);
+                await Actions.stopAd(socname, adId)
             });
         });
 
         const disapproveButton = document.querySelectorAll('.senddisapprove');
         disapproveButton.forEach(button => {
-            button.addEventListener('click', (event) => {
+            button.addEventListener('click', async (event) => {
                 const socname = event.target.dataset.socname;
                 const adId = event.target.dataset.adid;
-                Actions.sendAdAppeal(socname, adId);
+
+                const originalContent = event.target.innerHTML;
+                event.target.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                event.target.disabled = true;
+
+                await Actions.sendAdAppeal(socname, adId);
+
+                event.target.innerHTML = originalContent;
+                event.target.disabled = false;
             });
         });
     }
