@@ -75,7 +75,7 @@ export class Actions {
     }
 
     static async sendRulesToServer(socname, accId, jsonString) {
-        const resp = Requests.post(
+        const resp = await Requests.post(
             "ajax/uploadRules.php",
             `acc_name=${encodeURIComponent(socname)}&accid=${encodeURIComponent(accId)}&rules=${encodeURIComponent(jsonString)}`
         );

@@ -14,12 +14,12 @@ $serializer = new FbAccountSerializer(FILENAME);
 $acc = $serializer->getAccountByName($_POST['acc_name']);
 if ($acc == null) die("No account with name " . $_POST['acc_name'] . " found!");
 $rules = json_decode($_POST['rules'], true);
-$accId = json_decode($_POST['accid'], true);
+$accId = $_POST['accid'];
 $batch = [];
 foreach ($rules as $rule) {
-    $evspecstr = urlencode(json_encode($rule['evaluation_spec']));
-    $exspecstr = urlencode(json_encode($rule['execution_spec']));
-    $shedspecstr = urlencode(json_encode($rule['schedule_spec']));
+    $evspecstr = json_encode($rule['evaluation_spec']);
+    $exspecstr = json_encode($rule['execution_spec']);
+    $shedspecstr = json_encode($rule['schedule_spec']);
 
     $batchItem = [
         'name' => $rule['name'],
@@ -31,7 +31,7 @@ foreach ($rules as $rule) {
     $batch[] = $batchItem;
 }
 
-$batchJson = json_encode($batch);
+$batchJson = urlencode(json_encode($batch));
 
 $req = new FbRequests();
 $resp = $req->Post($acc, "", "batch=$batchJson&include_headers=false");
