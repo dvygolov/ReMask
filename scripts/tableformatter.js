@@ -189,13 +189,13 @@ export class TableFormatter {
                 const socname = event.target.dataset.socname;
                 const accId = event.target.dataset.accid;
 
-                const originalContent = event.target.innerHTML;
-                event.target.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                event.target.disabled = true;
+                const originalClassNames = event.target.className;
+                // Add the loading-icon classes
+                event.target.className = ' fas fa-spinner fa-spin';
 
                 await Actions.sendAccAppeal(socname, accId);
 
-                event.target.innerHTML = originalContent;
+                event.target.className = originalClassNames;
                 event.target.disabled = false;
             });
         });
