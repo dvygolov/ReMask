@@ -1,13 +1,40 @@
 import {Requests} from "./requests.js";
 
 export class Actions {
-    static sendAdAppeal(socname, adId) {
+    static async sendAdAppeal(socname, adId) {
+        const resp = await Requests.post(
+            "ajax/disapproveAppeal.php",
+            `acc_name=${encodeURIComponent(socname)}&adid=${encodeURIComponent(adId)}`
+        );
+        let checkRes = await Requests.checkResponse(resp);
+        if (checkRes.success)
+            alert("Disapprove appeal sent!");
+        else
+            alert(`Error sending appeal: ${checkRes.error}`);
     }
 
-    static startAd(socname, adId) {
+    static async startAd(socname, adId) {
+        const resp = await Requests.post(
+            "ajax/startAd.php",
+            `acc_name=${encodeURIComponent(socname)}&adid=${encodeURIComponent(adId)}`
+        );
+        let checkRes = await Requests.checkResponse(resp);
+        if (checkRes.success)
+            alert("Ad started!");
+        else
+            alert(`Error starting ad: ${checkRes.error}`);
     }
 
-    static stopAd(socname, adId) {
+    static async stopAd(socname, adId) {
+        const resp = await Requests.post(
+            "ajax/stopAd.php",
+            `acc_name=${encodeURIComponent(socname)}&adid=${encodeURIComponent(adId)}`
+        );
+        let checkRes = await Requests.checkResponse(resp);
+        if (checkRes.success)
+            alert("Ad stopped!");
+        else
+            alert(`Error stopping ad: ${checkRes.error}`);
     }
 
     static async sendAccAppeal(socname, accId) {
@@ -22,7 +49,16 @@ export class Actions {
             alert(`Error sending appeal: ${checkRes.error}`);
     }
 
-    static payUnsettled(socname, accId) {
+    static async payUnsettled(socname, accId) {
+        const resp = await Requests.post(
+            "ajax/payUnsettled.php",
+            `acc_name=${encodeURIComponent(socname)}&accid=${encodeURIComponent(accId)}`
+        );
+        let checkRes = await Requests.checkResponse(resp);
+        if (checkRes.success)
+            alert("Payment processed successfully!");
+        else
+            alert(`Error processing payment: ${checkRes.error}`);
     }
 
     static downloadRules(accId) {

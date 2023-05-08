@@ -184,7 +184,7 @@ export class TableFormatter {
             });
         });
 
-        const payButtons = document.querySelectorAll('.payUnsettled');
+        const payButtons = document.querySelectorAll('.payunsettled');
         payButtons.forEach(button => {
             button.addEventListener('click', async (event) => {
                 const socname = event.target.dataset.socname;

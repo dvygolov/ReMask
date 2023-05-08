@@ -37,6 +37,8 @@ $resp = $req->PrivatePost(
     "__a=1&fb_dtsg=" . urlencode($dtsg) . "&variables=" . urlencode($jsonVars) . "&doc_id=5197966936890203");
 $js = json_decode($resp['res'], true);
 $policySent = ($js['data']['xfb_alr_ad_account_appeal_create']['success'] === true);
-if (!$policySent)
+if (!$policySent) {
+    $resp['res'] = null;
     $resp['error'] = "Couldn't send Policy Ticket!";
+}
 ResponseFormatter::Respond($resp);
