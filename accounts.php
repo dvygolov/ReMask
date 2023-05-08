@@ -15,6 +15,7 @@ $accounts = $serializer->deserialize();
 <head class="text-center">
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=2, shrink-to-fit=no"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" rel="stylesheet">
     <link href="styles/bootstrap.min.css" rel="stylesheet"/>
     <link href="styles/signin.css" rel="stylesheet"/>
     <link rel="icon" type="image/png" href="styles/img/favicon.png">
@@ -23,29 +24,6 @@ $accounts = $serializer->deserialize();
     <title><?php include 'version.php' ?></title>
 </head>
 <body class="text-center">
-<?php include 'menu.php' ?>
-<br/>
-<table class="centertable">
-    <tbody style="color:#c8ccd6">
-
-    <?php for ($i = 0; $i < count($accounts); $i++) { ?>
-        <TR>
-            <TD class='nameclmn'><?= $accounts[$i]->name ?></TD>
-            <TD style="margin-left: 10px;">
-                <a href="#" class="editaccount" data-name="<?= $accounts[$i]->name ?>">[Edit]</a>
-            </TD>
-            <TD style="margin-left: 10px;">
-                <a href="#" class="delaccount" data-name="<?= $accounts[$i]->name ?>">[Delete]</a>
-            </TD>
-        </TR>
-    <?php } ?>
-    </tbody>
-</table>
-<br/>
-<br/>
-<b style="color:#c8ccd6">Add Account</b>
-<br/>
-<br/>
 <style>
     .form-container {
         display: grid;
@@ -65,27 +43,53 @@ $accounts = $serializer->deserialize();
         justify-content: center;
     }
 
-    input[name="additem"] {
+    #addaccountbutton {
         margin-top: 10px;
     }
 </style>
 
+<?php include 'menu.php' ?>
+<br/>
+<table class="centertable">
+    <tbody style="color:#c8ccd6">
+
+    <?php for ($i = 0; $i < count($accounts); $i++) { ?>
+        <TR>
+            <TD class='nameclmn'><?= $accounts[$i]->name ?></TD>
+            <TD style="margin-left: 10px;">
+                <a href="javascript:void(0);" class="editaccount" data-name="<?= $accounts[$i]->name ?>">[Edit]</a>
+            </TD>
+            <TD style="margin-left: 10px;">
+                <a href="javascript:void(0);" class="delaccount" data-name="<?= $accounts[$i]->name ?>">[Delete]</a>
+            </TD>
+        </TR>
+    <?php } ?>
+    </tbody>
+</table>
+<br/>
+<br/>
+<b style="color:#c8ccd6">Add Account</b>
+<br/>
+<br/>
 <div class="form-wrapper">
     <form name="add" class="form-container">
         <label for="name">Name:</label>
-        <input name="name" type="text" class="form-control" value="" placeholder="John Doe" />
+        <input name="name" type="text" class="form-control" value="" placeholder="John Doe"/>
 
         <label for="token">Token:</label>
-        <input name="token" type="text" class="form-control" value="" placeholder="EAAB...." />
+        <input name="token" type="text" class="form-control" value="" placeholder="EAAB...."/>
 
         <label for="cookies">Cookies:</label>
-        <input name="cookies" type="text" class="form-control" value="" placeholder="in JSON format" />
+        <input name="cookies" type="text" class="form-control" value="" placeholder="in JSON format"/>
 
         <label for="proxy">Proxy:</label>
-        <input name="proxy" type="text" class="form-control" value="" placeholder="type:ip:port:login:pass" />
+        <input name="proxy" type="text" class="form-control" value="" placeholder="type:ip:port:login:pass"/>
 
         <div></div>
-        <input type="button" id="addaccountbutton" class="btn btn-primary" value="Add!" />
+        <button type="button" id="addaccountbutton" class="btn btn-primary">
+            <i id="loadingIcon" class="fas fa-spinner fa-spin" style="display:none;"></i>
+            ADD
+        </button>
     </form>
 </div>
 <br/>

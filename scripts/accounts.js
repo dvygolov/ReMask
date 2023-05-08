@@ -17,9 +17,16 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+
+    const loadingIcon = document.getElementById('loadingIcon');
     const addAccountButton = document.getElementById("addaccountbutton");
     addAccountButton.addEventListener('click', async (event) => {
+        // Show the loading icon
+        loadingIcon.style.display = 'inline-block';
+
         await addAccount();
+        // Hide the loading icon
+        loadingIcon.style.display = 'none';
     });
 });
 
@@ -117,8 +124,7 @@ async function validate_form(name, token, cookies, proxy) {
         `name=${encodeURIComponent(name)}&token=${encodeURIComponent(token)}&cookies=${encodeURIComponent(cookies)}&proxy=${encodeURIComponent(proxy)}`
     );
     let checkResp = await Requests.checkResponse(resp);
-    if (!checkResp.success)
-    {
+    if (!checkResp.success) {
         alert(`Error checking account: ${checkResp.error}`);
         return false;
     }
