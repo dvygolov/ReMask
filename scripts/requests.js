@@ -1,5 +1,5 @@
 export class Requests {
-    static async fetchData(accName, datetime) {
+    static async getStats(accName, datetime) {
         let url = `/ajax/getAccountStatistics.php?acc_name=${accName}&datetime=${datetime}`;
         let resp = await fetch(url);
         let checkRes = await this.checkResponse(resp);

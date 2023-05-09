@@ -37,7 +37,7 @@ class FbRequests
             "sec-fetch-mode: cors",
             "sec-fetch-site: same-origin",
         ];
-        $finalUrl = $customUrl == null ? $this->api . $url : $customUrl . $url;
+        $finalUrl =  $this->api . $url;
         $finalBody = $body . "&access_token=" . $acc->token;
 
         $optArray = array(

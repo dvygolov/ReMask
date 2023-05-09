@@ -18,8 +18,8 @@ export async function loadAllStatistics() {
 async function load(accName, datetime) {
     try {
         let adAccounts = [];
-        let rawAccounts = await Requests.fetchData(accName, datetime);
-        for (const accIndex in rawAccounts.data) {
+        let rawAccounts = await Requests.getStats(accName, datetime);
+        for (const accIndex in rawAccounts.stats.data) {
             const rawAccount = rawAccounts.data[accIndex];
             adAccounts.push(new AdAccount(rawAccount, accName));
         }

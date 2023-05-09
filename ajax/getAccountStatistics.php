@@ -78,4 +78,26 @@ ads.date_preset($datetime).time_increment($datetime).limit(500){
 $requestParams = preg_replace('/\s+/', '', $requestParams);
 $req = new FbRequests();
 $resp = $req->Get($acc, "me/adaccounts?$requestParams");
+$stats = json_decode($resp['res'], true);
+
+$batch = [];
+foreach ($stats['data'] as $adAcc) {
+    $batchItem = [
+        'name' => $adAcc['id'],
+        'method' => 'GET',
+        'relative_url' =>
+            $adAcc['id'] . "/ads?fields=insights.limit(500).date_preset($datetime){results,cost_per_result}"
+    ];
+    $batch[] = $batchItem;
+}
+
+$batchJson = urlencode(json_encode($batch));
+
+$req = new FbRequests();
+$resp = $req->Post($acc, "", "batch=$batchJson&include_headers=false");
+$insights = $resp['res'];
+$finalRes = [];
+$finalRes['stats'] = $stats;
+$finalRes['insights'] = json_decode($insights, true);
+$resp['res'] = json_encode($finalRes);
 ResponseFormatter::Respond($resp);
