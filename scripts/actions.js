@@ -87,6 +87,18 @@ export class Actions {
         setTimeout(() => URL.revokeObjectURL(link.href), 100);
     }
 
+    static async deleteRules(socname, accId) {
+        let rules = window.adAcounts.filter(acc=>acc.id==accId)[0].rules.map(r=>r.id).join(',');
+        const resp = await Requests.post(
+            "ajax/delRules.php",
+            `acc_name=${encodeURIComponent(socname)}&rules=${encodeURIComponent(rules)}`
+        );
+        let checkRes = await Requests.checkResponse(resp);
+        if (checkRes.success)
+            alert("All rules deleted!");
+        else
+            alert(`Error deleting rules: ${checkRes.error}`);
+    }
     static async uploadRules(socname, accId) {
         const fileInput = document.createElement("input");
         fileInput.type = "file";

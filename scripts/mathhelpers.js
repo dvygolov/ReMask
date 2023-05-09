@@ -2,7 +2,7 @@ export class MathHelpers {
     static average(arr) {
         const validNumbers = arr
             .map(Number)
-            .filter(num => !isNaN(num));
+            .filter(num => !isNaN(num) && num!==0);
 
         if (validNumbers.length === 0) {
             return 0;

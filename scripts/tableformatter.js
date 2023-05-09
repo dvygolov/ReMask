@@ -122,8 +122,10 @@ export class TableFormatter {
             actions += `<i class="fas fa-paper-plane sendappeal" title="Send appeal" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
         else if (acc.status == 3) //UNSETTLED
             actions += `<i class="fas fa-money-bill payunsettled" title="Pay UNSETTLED" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
-        if (acc.rules.length > 0)
+        if (acc.rules.length > 0) {
             actions += `<span title="${acc.rules.map(rule => rule.name).join('\n')}">${acc.rules.length}</span> <i class="fas fa-download downrules" title="Download autorules" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
+            actions += `<i class="fas fa-trash-can delrules" title="Delete autorules" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
+        }
         if (acc.status != 2)
             actions += `<i class="fas fa-upload uprules" title="Upload autorules" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
         return actions;
@@ -179,6 +181,20 @@ export class TableFormatter {
                 event.target.className = ' fas fa-spinner fa-spin';
                 event.target.disabled = true;
                 await Actions.uploadRules(socname, accId);
+                event.target.className = originalClassNames;
+                event.target.disabled = false;
+            });
+        });
+
+        const delRulesButtons = document.querySelectorAll('.delrules');
+        delRulesButtons.forEach(button => {
+            button.addEventListener('click', async (event) => {
+                const socname = event.target.dataset.socname;
+                const accId = event.target.dataset.accid;
+                const originalClassNames = event.target.className;
+                event.target.className = ' fas fa-spinner fa-spin';
+                event.target.disabled = true;
+                await Actions.deleteRules(socname, accId);
                 event.target.className = originalClassNames;
                 event.target.disabled = false;
             });

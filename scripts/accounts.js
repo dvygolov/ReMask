@@ -50,7 +50,7 @@ async function editAccount(name) {
     let checkResp = await Requests.checkResponse(resp);
     if (checkResp.success) {
         document.add.name.value = checkResp.data.name;
-        document.add.name.readonly = true;
+        document.add.name.readOnly = true;
         document.add.token.value = checkResp.data.token;
         document.add.cookies.value = JSON.stringify(checkResp.data.cookies);
         // Convert the proxy JSON object to a colon-separated string
