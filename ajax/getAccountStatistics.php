@@ -39,7 +39,7 @@ ads.date_preset($datetime).time_increment($datetime).limit(500){
     link_ctr,
     spent,
     insights.limit(500).date_preset($datetime){
-        results,
+        results{values{value}},
         inline_link_click_ctr,
         inline_link_clicks,
         ctr,
@@ -86,7 +86,7 @@ foreach ($stats['data'] as $adAcc) {
         'name' => $adAcc['id'],
         'method' => 'GET',
         'relative_url' =>
-            $adAcc['id'] . "/ads?fields=insights.limit(500).date_preset($datetime){results,cost_per_result}"
+            $adAcc['id'] . "/ads?fields=id,insights.limit(500).date_preset($datetime){results,cost_per_result}"
     ];
     $batch[] = $batchItem;
 }
@@ -95,9 +95,16 @@ $batchJson = urlencode(json_encode($batch));
 
 $req = new FbRequests();
 $resp = $req->Post($acc, "", "batch=$batchJson&include_headers=false");
-$insights = $resp['res'];
+$results = json_decode($resp['res'], true);
+
+$json_results = [];
+foreach ($results as $result){
+   $json_result =  json_decode($result['body'],true);
+   $json_results[] = $json_result['data'];
+}
+
 $finalRes = [];
 $finalRes['stats'] = $stats;
-$finalRes['insights'] = json_decode($insights, true);
+$finalRes['insights'] = $json_results;
 $resp['res'] = json_encode($finalRes);
 ResponseFormatter::Respond($resp);
