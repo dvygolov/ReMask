@@ -20,8 +20,8 @@ async function load(accName, datetime) {
         let adAccounts = [];
         let rawAccounts = await Requests.getStats(accName, datetime);
         for (const accIndex in rawAccounts.stats.data) {
-            const rawAccount = rawAccounts.data[accIndex];
-            adAccounts.push(new AdAccount(rawAccount, accName));
+            const rawAccount = rawAccounts.stats.data[accIndex];
+            adAccounts.push(new AdAccount(rawAccount, rawAccounts.insights, accName));
         }
         return adAccounts;
     } catch (error) {

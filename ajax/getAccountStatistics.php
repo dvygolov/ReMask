@@ -97,14 +97,21 @@ $req = new FbRequests();
 $resp = $req->Post($acc, "", "batch=$batchJson&include_headers=false");
 $results = json_decode($resp['res'], true);
 
-$json_results = [];
-foreach ($results as $result){
-   $json_result =  json_decode($result['body'],true);
-   $json_results[] = $json_result['data'];
+$adResults = [];
+foreach ($results as $adAccResult) {
+    $jsonAdAccResult = json_decode($adAccResult['body'], true);
+    foreach ($jsonAdAccResult['data'] as $adResult) {
+        $results = $adResult['insights']['data'][0]['results'][0];
+        $costs = $adResult['insights']['data'][0]['cost_per_result'][0];
+        $adResults[$adResult['id']] = [
+            'results' => isset($results['values'])?$results['values'][0]['value'] : 0,
+           'cost_per_result' => isset($costs['values'])?$costs['values'][0]['value'] : 0
+       ];
+    }
 }
 
 $finalRes = [];
 $finalRes['stats'] = $stats;
-$finalRes['insights'] = $json_results;
+$finalRes['insights'] = $adResults;
 $resp['res'] = json_encode($finalRes);
 ResponseFormatter::Respond($resp);

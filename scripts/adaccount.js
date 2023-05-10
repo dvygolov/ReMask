@@ -2,7 +2,7 @@ import {Ad} from "./ad.js";
 import {MathHelpers} from "./mathhelpers.js";
 
 export class AdAccount {
-    constructor(accountData, accName) {
+    constructor(accountData, insightsData, accName) {
         this.id = accountData.id.replace(/^act_/, '');
         this.socname = accName;
         this.name = accountData.name;
@@ -20,7 +20,7 @@ export class AdAccount {
         this.funding_source_details = accountData.funding_source_details;
         this.adspixels = accountData.adspixels;
         this.insights = accountData.insights;
-        this.ads = accountData.ads ? accountData.ads.data.map(adData => new Ad(adData)) : [];
+        this.ads = accountData.ads ? accountData.ads.data.map(adData => new Ad(adData,insightsData)) : [];
         this.createdtime = accountData.created_time;
         this.rules = accountData.adrules_library?.data ?? [];
 

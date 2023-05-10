@@ -98,7 +98,7 @@ export class TableFormatter {
             `${this.getAdActions(acc, ad)}`,
             `<p style="color:${esColor};">${ad.status}<br/> ${ad.reviewFeedback}</p>`,
             `<nobr>${ad.results}</nobr>`,
-            `<nobr>${ad.CPL}</nobr>`,
+            `<nobr>${ad.CPA}</nobr>`,
             `<nobr>${ad.spend}</nobr>`,
             `<nobr>${ad.clicks}</nobr>`,
             `<nobr>${ad.CPC}</nobr>`,

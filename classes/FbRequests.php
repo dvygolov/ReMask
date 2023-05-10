@@ -37,7 +37,7 @@ class FbRequests
             "sec-fetch-mode: cors",
             "sec-fetch-site: same-origin",
         ];
-        $finalUrl =  $this->api . $url;
+        $finalUrl = $this->api . $url;
         $finalBody = $body . "&access_token=" . $acc->token;
 
         $optArray = array(
@@ -107,7 +107,6 @@ class FbRequests
         $userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36";
         $optArray[CURLOPT_USERAGENT] = $userAgent;
         $optArray[CURLOPT_SSL_VERIFYPEER] = false;
-
         $curl = curl_init();
         curl_setopt_array($curl, $optArray);
         $res = curl_exec($curl);
@@ -119,6 +118,7 @@ class FbRequests
             "info" => $info,
             "error" => $error
         ];
+        //TODO: check for { "message": "Error loading application", "type": "OAuthException", "code": 190}
+        // if so - get new Access Token
     }
-
 }
