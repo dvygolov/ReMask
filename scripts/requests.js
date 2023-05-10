@@ -31,7 +31,7 @@ export class Requests {
             if (json.error) {
                 if (typeof json.error === 'object')
                     json.error = JSON.stringify(json.error);
-                return {success: false, error: `Got error: ${json.error}!`};
+                return {success: false, error: json.error};
             }
             return {success: true, data: json};
         } else {

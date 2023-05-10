@@ -31,10 +31,8 @@ $variables = [
 $jsonVars = json_encode($variables);
 
 $dtsg = $req->GetDtsg($acc);
-
-$resp = $req->PrivatePost(
-    $acc,
-    "__a=1&fb_dtsg=" . urlencode($dtsg) . "&variables=" . urlencode($jsonVars) . "&doc_id=5197966936890203");
+$body = "__a=1&fb_dtsg=" . urlencode($dtsg) . "&variables=" . urlencode($jsonVars) . "&doc_id=5197966936890203";
+$resp = $req->PrivatePost($acc, $body);
 $js = json_decode($resp['res'], true);
 $policySent = ($js['data']['xfb_alr_ad_account_appeal_create']['success'] === true);
 if (!$policySent) {

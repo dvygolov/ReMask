@@ -9,7 +9,7 @@ export class AdAccount {
         this.pixelid = accountData.adspixels?.data[0]?.id ?? "";
         this.spendlimit = accountData.adtrust_dsl;
         this.billing = MathHelpers.mathMoney(accountData.adspaymentcycle?.data?.[0]?.threshold_amount ?? 0);
-        this.curspend = accountData.current_unbilled_spend?.amount ?? 0;
+        this.curspend = MathHelpers.mathStat(accountData.current_unbilled_spend?.amount ?? 0);
         this.totalspend = MathHelpers.mathMoney(accountData.amount_spent ?? 0);
         this.cardinfo = accountData.funding_source_details?.display_string ?? "";
         this.currency = accountData.currency;
@@ -44,6 +44,7 @@ export class AdAccount {
             this.totalStats.impressions += ad.impressions;
             this.totalStats.CPM.push(ad.CPM);
         });
+        this.totalStats.spend = MathHelpers.mathStat(this.totalStats.spend);
     }
 
     isActive() {
