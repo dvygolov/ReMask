@@ -14,7 +14,6 @@ $serializer = new FbAccountSerializer(FILENAME);
 $acc = $serializer->getAccountByName($_POST['acc_name']);
 if ($acc == null) die("No account with name " . $_POST['acc_name'] . " found!");
 $rules = explode(",", $_POST['rules']);
-$accId = $_POST['accid'];
 $batch = [];
 foreach ($rules as $rule) {
     $batchItem = [
@@ -29,5 +28,15 @@ $batchJson = urlencode(json_encode($batch));
 
 $req = new FbRequests();
 $resp = $req->Post($acc, "", "batch=$batchJson&include_headers=false");
+if (!$resp['error']) {
+    $batchJson = json_decode($resp['res'], true);
+    foreach ($batchJson as $batchItem){
+        if ($batchItem['code']!=200) {
+            $resp['res']='';
+            $resp['error'] = $batchItem['body'];
+            break;
+        }
+    }
+}
 
 ResponseFormatter::Respond($resp);

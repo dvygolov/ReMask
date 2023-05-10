@@ -35,5 +35,15 @@ $batchJson = urlencode(json_encode($batch));
 
 $req = new FbRequests();
 $resp = $req->Post($acc, "", "batch=$batchJson&include_headers=false");
+if (!$resp['error']) {
+    $batchJson = json_decode($resp['res'], true);
+    foreach ($batchJson as $batchItem){
+        if ($batchItem['code']!=200) {
+            $resp['res']='';
+            $resp['error'] = json_decode($batchItem['body'],true)['error']['message'];
+            break;
+        }
+    }
+}
 
 ResponseFormatter::Respond($resp);
