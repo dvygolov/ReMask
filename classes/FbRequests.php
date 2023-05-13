@@ -54,7 +54,7 @@ class FbRequests
         return $this->execute($optArray);
     }
 
-    public function PrivatePost($acc, $body): array
+    public function PrivatePost($acc, $body, $customUrl = null): array
     {
         $headers = [
             "content-type: application/x-www-form-urlencoded",
@@ -65,8 +65,9 @@ class FbRequests
             "sec-fetch-site: same-origin",
         ];
 
+        $url = $customUrl??"https://www.facebook.com/api/graphql";
         $optArray = array(
-            CURLOPT_URL => "https://www.facebook.com/api/graphql",
+            CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true, // Set the request method to POST
             CURLOPT_POSTFIELDS => $body, // Set the POST data
