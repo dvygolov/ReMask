@@ -39,6 +39,9 @@ ads.date_preset($datetime).time_increment($datetime).limit(500){
     link_ctr,
     spent,
     insights.limit(500).date_preset($datetime){
+        conversion_rate_ranking, 
+        engagement_rate_ranking, 
+        quality_ranking,
         results{values{value}},
         inline_link_click_ctr,
         inline_link_clicks,

@@ -28,6 +28,6 @@ $ijson['input'] = $input;
 $vars = json_encode($ijson);
 
 $req = new FbRequests();
-$req->PrivatePost($acc, "doc_id=2367718093263338&variables=$vars");
+$resp = $req->PrivatePost($acc, "doc_id=2367718093263338&variables=$vars");
 
 ResponseFormatter::Respond($resp);
