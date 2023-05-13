@@ -1,4 +1,4 @@
-<FilesMatch "(accounts\.csv|base\.txt)">
+<FilesMatch "(accounts\.json)">
 Order allow,deny
 Deny from all
 </FilesMatch>

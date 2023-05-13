@@ -15,13 +15,11 @@ $acc = $serializer->getAccountByName($_POST['acc_name']);
 $accId = $_POST['accid'];
 
 $req = new FbRequests();
-$resp = $req->Get($acc, "me");
-$me = json_decode($resp['res'], true);
 
 $variables = [
     "input" => [
         "client_mutation_id" => "1",
-        "actor_id" => $me['id'],
+        "actor_id" => $acc->userId,
         "ad_account_id" => $accId,
         "ids_issue_ent_id" => "880164863403788",
         "appeal_comment" => "I'm not sure which policy was violated.",

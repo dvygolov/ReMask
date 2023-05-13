@@ -3,6 +3,7 @@
 class FbAccount
 {
     public string $name;
+    public string $userId;
     public string $token;
     public ?string $dtsg;
     public array $cookies;
@@ -14,6 +15,8 @@ class FbAccount
         if (json_last_error() !== JSON_ERROR_NONE) {
             die("JSON Error: " . json_last_error_msg());
         }
+
+        $this->userId = $jsonCookies[array_search('c_user', array_column($jsonCookies, 'name'))]['value'] ?? '';
         $this->name = $name;
         $this->token = $token;
         $this->cookies = $jsonCookies;
