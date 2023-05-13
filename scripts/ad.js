@@ -19,6 +19,9 @@ export class Ad {
         this.thumbUrl = this.adcreative.thumbnail_url ?? '';
         this.link = this.adcreative.object_story_spec?.link_data?.link ?? '';
         this.urlparams = this.adcreative.url_tags ?? '';
+        this.qualityScore = adData.insights.data[0].quality_ranking ?? "UNKNOWN";
+        this.engagementScore = adData.insights.data[0].engagement_rate_ranking ?? "UNKNOWN";
+        this.conversionScore =adData.insights.data[0].conversion_rate_ranking ?? "UNKNOWN";
     }
 
     isActive() {

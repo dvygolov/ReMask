@@ -1,3 +1,12 @@
+export const ranking = {
+    "BELOW_AVERAGE_10": "<10",
+    "BELOW_AVERAGE_20": "<20",
+    "BELOW_AVERAGE_35": "<35",
+    "AVERAGE": "50",
+    "ABOVE_AVERAGE": ">50",
+    "UNKNOWN": "N/A"
+};
+
 export const disable_reasons = [
     '',
     'ADS_INTEGRITY_POLICY',

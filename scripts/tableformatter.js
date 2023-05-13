@@ -1,4 +1,4 @@
-import {account_statuses, disable_reasons} from "./constants.js";
+import {account_statuses, disable_reasons, ranking} from "./constants.js";
 import {MathHelpers} from "./mathhelpers.js";
 import {Actions} from "./actions.js";
 
@@ -6,7 +6,7 @@ export class TableFormatter {
     addTableHeader(parent) {
         let tr = document.createElement('tr');
         const headers = [
-            'Creo', 'Name/Link', 'Actions', 'Status/Reason',
+            'Creo', 'Name/Link', 'Actions', 'Status/Ranking',
             'Results', 'CPA', 'Spend', 'Clicks', 'CPC', 'CTR',
             'Impres.', 'CPM'
         ];
@@ -92,11 +92,12 @@ export class TableFormatter {
         if (ad.urlparams) link += ad.urlparams;
         const name = ad.link ? `<a href='${link}' target='_blank'>${ad.name}</a>` : ad.name;
         const esColor = this.getAdStatusColor(ad.status);
+        const rank = `${ranking[ad.engagementScore]}|${ranking[ad.conversionScore]}|${ranking[ad.qualityScore]}`;
         const tdArray = [
             imageCell,
             `<nobr>${name}</nobr>`,
             `${this.getAdActions(acc, ad)}`,
-            `<p style="color:${esColor};">${ad.status}<br/> ${ad.reviewFeedback}</p>`,
+            `<p style="color:${esColor};">${ad.status}<br/>${ad.reviewFeedback}<br/>${rank}</p>`,
             `<nobr>${ad.results}</nobr>`,
             `<nobr>${ad.CPA}</nobr>`,
             `<nobr>${ad.spend}</nobr>`,
