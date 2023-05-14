@@ -92,12 +92,15 @@ export class TableFormatter {
         if (ad.urlparams) link += ad.urlparams;
         const name = ad.link ? `<a href='${link}' target='_blank'>${ad.name}</a>` : ad.name;
         const esColor = this.getAdStatusColor(ad.status);
-        const rank = `${ranking[ad.engagementScore]}|${ranking[ad.conversionScore]}|${ranking[ad.qualityScore]}`;
+        const rank = `<span title="Engagement">${ranking[ad.engagementScore]}</span>|<span title="Conversion">${ranking[ad.conversionScore]}</span>|<span title="Quality">${ranking[ad.qualityScore]}</span>`;
+        let status = ad.status;
+        if (ad.reviewFeedback) status+=`<br/>${ad.reviewFeedback}`;
+        if (ad.qualityScore && ad.qualityScore!=="UNKNOWN") status +=`<br/>${rank}`;
         const tdArray = [
             imageCell,
             `<nobr>${name}</nobr>`,
             `${this.getAdActions(acc, ad)}`,
-            `<p style="color:${esColor};">${ad.status}<br/>${ad.reviewFeedback}<br/>${rank}</p>`,
+            `<p style="color:${esColor};">${status}</p>`,
             `<nobr>${ad.results}</nobr>`,
             `<nobr>${ad.CPA}</nobr>`,
             `<nobr>${ad.spend}</nobr>`,
