@@ -12,5 +12,5 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 $acc = FbAccount::fromArray($_POST);
 $req = new FbRequests();
-$resp = $req->Get($acc,"me");
+$resp = $req->ApiGet($acc,"me");
 ResponseFormatter::Respond($resp);

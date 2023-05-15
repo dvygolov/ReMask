@@ -7,7 +7,7 @@ require_once __DIR__ . '/../classes/FbAccountSerializer.php';
 require_once __DIR__ . '/../classes/FbRequests.php';
 require_once __DIR__ . '/../classes/ResponseFormatter.php';
 if (isset($_GET["name"])) {
-    $serializer = new FbAccountSerializer(FILENAME);
+    $serializer = new FbAccountSerializer(ACCOUNTSFILENAME);
     $accounts = $serializer->deleteAccountByName($_GET["name"]);
     http_response_code(200);
 } else

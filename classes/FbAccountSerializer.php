@@ -35,6 +35,29 @@ class FbAccountSerializer
         return $facebookAccounts;
     }
 
+    public function addOrUpdateAccount(FbAccount $acc):void
+    {
+        $accounts = $this->deserialize();
+        $accountExists = false;
+        foreach ($accounts as &$account) {
+            if ($account->name === $acc->name) {
+                $accountExists = true;
+                $account->token = $acc->token;
+                $account->cookies = $acc->cookies;
+                if (isset($acc->proxy)) {
+                    $account->proxy = $acc->proxy;
+                }
+                break;
+            }
+        }
+
+        if (!$accountExists) {
+            $accounts[] = $acc;
+        }
+
+        $this->serialize($accounts);
+    }
+
     public function getAccountByName($name): ?FbAccount
     {
         $accounts = $this->deserialize();

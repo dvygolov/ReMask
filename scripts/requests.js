@@ -4,7 +4,7 @@ export class Requests {
         let resp = await fetch(url);
         let checkRes = await this.checkResponse(resp);
         if (checkRes.success) return checkRes.data;
-        alert(checkRes.error);
+        alert(`${accName}: ${checkRes.error}`);
         return null;
     }
 

@@ -7,7 +7,7 @@ require_once __DIR__ . '/classes/FbAccountSerializer.php';
 require_once __DIR__ . '/classes/FbAccount.php';
 require_once __DIR__ . '/classes/RemaskProxy.php';
 
-$serializer = new FbAccountSerializer(FILENAME);
+$serializer = new FbAccountSerializer(ACCOUNTSFILENAME);
 $accounts = $serializer->deserialize();
 ?>
 <!DOCTYPE html>

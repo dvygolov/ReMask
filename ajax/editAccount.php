@@ -11,6 +11,6 @@ if (!isset($_GET["name"])) {
     ResponseFormatter::Respond(['error' => "Name not set!"]);
     exit;
 }
-$serializer = new FbAccountSerializer(FILENAME);
+$serializer = new FbAccountSerializer(ACCOUNTSFILENAME);
 $acc = $serializer->getAccountByName($_GET["name"]);
 ResponseFormatter::Respond(['res' => json_encode($acc)]);

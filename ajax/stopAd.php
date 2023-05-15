@@ -10,11 +10,11 @@ require_once __DIR__.'/../classes/ResponseFormatter.php';
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-$serializer = new FbAccountSerializer(FILENAME);
+$serializer = new FbAccountSerializer(ACCOUNTSFILENAME);
 $acc = $serializer->getAccountByName($_POST['acc_name']);
 if ($acc == null) die("No account with name " . $_POST['acc_name'] . " found!");
 
 $adId = $_POST['adid'];
 $req = new FbRequests();
-$resp = $req->Get($acc, "$adId?status=PAUSED&method=post");
+$resp = $req->ApiGet($acc, "$adId?status=PAUSED&method=post");
 ResponseFormatter::Respond($resp);

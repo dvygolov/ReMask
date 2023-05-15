@@ -7,7 +7,7 @@ require_once __DIR__ . '/../classes/FbAccountSerializer.php';
 require_once __DIR__ . '/../classes/FbRequests.php';
 require_once __DIR__ . '/../classes/ResponseFormatter.php';
 
-$serializer = new FbAccountSerializer(FILENAME);
+$serializer = new FbAccountSerializer(ACCOUNTSFILENAME);
 $acc = $serializer->getAccountByName($_GET['acc_name']);
 if ($acc == null) die("No account with name " . $_GET['acc_name'] . " found!");
 
@@ -28,6 +28,6 @@ $ijson['input'] = $input;
 $vars = json_encode($ijson);
 
 $req = new FbRequests();
-$resp = $req->PrivatePost($acc, "doc_id=2367718093263338&variables=$vars");
+$resp = $req->PrivateApiPost($acc, "doc_id=2367718093263338&variables=$vars");
 
 ResponseFormatter::Respond($resp);

@@ -10,7 +10,7 @@ require_once __DIR__ . '/../classes/ResponseFormatter.php';
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-$serializer = new FbAccountSerializer(FILENAME);
+$serializer = new FbAccountSerializer(ACCOUNTSFILENAME);
 $acc = $serializer->getAccountByName($_POST['acc_name']);
 
 $req = new FbRequests();
@@ -18,6 +18,6 @@ $accId = $_POST['accid'];
 $adId = $_POST['adid'];
 $url = "https://www.facebook.com/ads/integrity/appeals_case/creation/ajax/";
 $body = "ad_account_id=$accId&adgroup_ids[0]=$adId";
-$res = $req->PrivatePost($acc, $body, $url);
+$res = $req->PrivateApiPost($acc, $body, $url);
 
 ResponseFormatter::Respond($resp);

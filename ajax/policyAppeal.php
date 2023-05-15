@@ -10,7 +10,7 @@ require_once __DIR__ . '/../classes/ResponseFormatter.php';
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-$serializer = new FbAccountSerializer(FILENAME);
+$serializer = new FbAccountSerializer(ACCOUNTSFILENAME);
 $acc = $serializer->getAccountByName($_POST['acc_name']);
 $accId = $_POST['accid'];
 
@@ -30,7 +30,7 @@ $jsonVars = json_encode($variables);
 
 $dtsg = $req->GetDtsg($acc);
 $body = "__a=1&fb_dtsg=" . urlencode($dtsg) . "&variables=" . urlencode($jsonVars) . "&doc_id=5197966936890203";
-$resp = $req->PrivatePost($acc, $body);
+$resp = $req->PrivateApiPost($acc, $body);
 $js = json_decode($resp['res'], true);
 $policySent = ($js['data']['xfb_alr_ad_account_appeal_create']['success'] === true);
 if (!$policySent) {

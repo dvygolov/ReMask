@@ -7,7 +7,7 @@ require_once __DIR__ . '/../classes/FbAccountSerializer.php';
 require_once __DIR__ . '/../classes/FbRequests.php';
 require_once __DIR__ . '/../classes/ResponseFormatter.php';
 
-$serializer = new FbAccountSerializer(FILENAME);
+$serializer = new FbAccountSerializer(ACCOUNTSFILENAME);
 $acc = $serializer->getAccountByName($_GET['acc_name']);
 if ($acc == null) die("No account with name " . $_GET['acc_name'] . " found!");
 $datetime = $_GET['datetime'];
@@ -80,8 +80,14 @@ ads.date_preset($datetime).time_increment($datetime).limit(500){
 
 $requestParams = preg_replace('/\s+/', '', $requestParams);
 $req = new FbRequests();
-$resp = $req->Get($acc, "me/adaccounts?$requestParams");
+$resp = $req->ApiGet($acc, "me/adaccounts?$requestParams");
 $stats = json_decode($resp['res'], true);
+if (ResponseFormatter::ResponseHasError($resp))
+{
+    ResponseFormatter::Respond($resp);
+    exit;
+}
+
 
 $batch = [];
 foreach ($stats['data'] as $adAcc) {
@@ -97,7 +103,7 @@ foreach ($stats['data'] as $adAcc) {
 $batchJson = urlencode(json_encode($batch));
 
 $req = new FbRequests();
-$resp = $req->Post($acc, "", "batch=$batchJson&include_headers=false");
+$resp = $req->ApiPost($acc, "", "batch=$batchJson&include_headers=false");
 $results = json_decode($resp['res'], true);
 
 $adResults = [];

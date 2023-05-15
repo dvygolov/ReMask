@@ -16,4 +16,9 @@ class ResponseFormatter
         echo $json;
         ob_flush();
     }
+
+    public static function ResponseHasError(array $resp):bool
+    {
+        return str_contains($resp['res'], '"error":');
+    }
 }
