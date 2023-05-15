@@ -93,14 +93,14 @@ class FbRequests
 
     private function GetNewToken(FbAccount $acc): ?string
     {
-        $res = $this->RawGet($acc, "https://adsmanager.facebook.com/ads/manager");
+        $res = $this->RawGet($acc, "https://adsmanager.facebook.com/adsmanager/manage/all");
 
-        $location = $this->GetHeader("Location", $res['headers']);
+        $location = $this->GetLocationHeader($res['headers']);
         if (str_contains($location, 'checkpoint') ||
             str_contains($location, 'login')) return null;
 
         $redirect = null;
-        if (!preg_match('/window\.location\.replace\("([^"]+)/', $res['res'], $matches)) {
+        if (preg_match('/window\.location\.replace\("([^"]+)/', $res['res'], $matches)) {
             $redirect = str_replace("\\", "", $matches[1]);
         }
         if ($redirect === null) {
@@ -114,6 +114,24 @@ class FbRequests
         }
     }
 
+    private function ReplaceAccessToken($optArray, $newToken) {
+        // Regular expression to match access_token= followed by any character sequence that isn't & or end of string
+        $pattern = '/(access_token=)([^&]*)/';
+
+        // Check if it's a POST request
+        if (isset($optArray[CURLOPT_POST]) && $optArray[CURLOPT_POST]) {
+            if (isset($optArray[CURLOPT_POSTFIELDS])) {
+                $optArray[CURLOPT_POSTFIELDS] = preg_replace($pattern, '$1' . $newToken, $optArray[CURLOPT_POSTFIELDS]);
+            }
+        } else {
+            // It's a GET request
+            if (isset($optArray[CURLOPT_URL])) {
+                $optArray[CURLOPT_URL] = preg_replace($pattern, '$1' . $newToken, $optArray[CURLOPT_URL]);
+            }
+        }
+        return $optArray;
+    }
+
 
     private function ParseToken($text)
     {
@@ -123,14 +141,14 @@ class FbRequests
         return null;
     }
 
-    private function GetHeader(string $headerName, string $headers)
+    private function GetLocationHeader($headers): ?string
     {
-        preg_match("/$headerName: (.*?)\n/", $headers, $matches);
+        preg_match("/location: (.*?)\n/", $headers, $matches);
         $header = isset($matches[1]) ? trim($matches[1]) : null;
         return $header;
     }
 
-    private function RawGet(FbAccount $acc, string $url): string
+    private function RawGet(FbAccount $acc, string $url): array
     {
         $headers = [
             "sec-fetch-dest: document",
@@ -144,7 +162,8 @@ class FbRequests
             CURLOPT_COOKIE => $acc->getCurlCookies(),
             CURLOPT_HTTPHEADER => $headers,
         );
-        return $this->Execute($acc, $optArray);
+        $res = $this->Execute($acc, $optArray);
+        return $res;
     }
 
     private function Execute(FbAccount $acc, array $optArray): array
@@ -158,10 +177,10 @@ class FbRequests
         $res = curl_exec($curl);
         $info = curl_getinfo($curl);
         $error = curl_error($curl);
-        $header = null;
+        $headers = null;
         if ($res !== false) {
             $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
-            $header = substr($res, 0, $header_size);
+            $headers = substr($res, 0, $header_size);
             $res = substr($res, $header_size);
         }
         curl_close($curl);
@@ -171,12 +190,13 @@ class FbRequests
                 $acc->token = $token;
                 $serializer = new FbAccountSerializer(ACCOUNTSFILENAME);
                 $serializer->addOrUpdateAccount($acc);
+                $optArray = $this->ReplaceAccessToken($optArray, $token);
                 return $this->Execute($acc, $optArray);
             }
         }
         return [
             "res" => $res,
-            "header" => $header,
+            "headers" => $headers,
             "info" => $info,
             "error" => $error
         ];
