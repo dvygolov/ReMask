@@ -57,7 +57,7 @@ class RemaskProxy
             $optArray[CURLOPT_PROXYTYPE] = 'HTTP';
         else
             $optArray[CURLOPT_PROXYTYPE] = CURLPROXY_SOCKS5;
-        $optArray[CURLOPT_PROXY] = $this->ip;
+        $optArray[CURLOPT_PROXY] = strtolower($this->type)==='http'?"http://".$this->ip:"socks5://".$this->ip;
         $optArray[CURLOPT_PROXYPORT] = $this->port;
         $optArray[CURLOPT_PROXYUSERPWD] = $this->login . ':' . $this->password;
     }

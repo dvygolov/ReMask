@@ -24,7 +24,6 @@ class FbRequests
             CURLOPT_COOKIE => $acc->getCurlCookies(),
             CURLOPT_HTTPHEADER => $headers,
         );
-        $acc->proxy?->AddToCurlOptions($optArray);
         return $this->Execute($acc, $optArray);
     }
 
@@ -50,7 +49,6 @@ class FbRequests
             CURLOPT_HTTPHEADER => $headers,
         );
 
-        $acc->proxy?->AddToCurlOptions($optArray);
 
         return $this->Execute($acc, $optArray);
     }
@@ -174,6 +172,8 @@ class FbRequests
         $optArray[CURLOPT_USERAGENT] = $userAgent;
         $optArray[CURLOPT_SSL_VERIFYPEER] = false;
         $optArray[CURLOPT_HEADER] = true;
+
+        $acc->proxy?->AddToCurlOptions($optArray);
         $curl = curl_init();
         curl_setopt_array($curl, $optArray);
         $res = curl_exec($curl);
