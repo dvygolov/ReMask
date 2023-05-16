@@ -49,10 +49,12 @@ export class Actions {
             alert(`Error sending appeal: ${checkRes.error}`);
     }
 
-    static async payUnsettled(socname, accId) {
+    static async payUnsettled(socname, accId, paymentId, currency) {
+        let sum = prompt("Enter money amount to pay:");
+        if (!sum) return;
         const resp = await Requests.post(
             "ajax/payUnsettled.php",
-            `acc_name=${encodeURIComponent(socname)}&accid=${encodeURIComponent(accId)}`
+            `acc_name=${encodeURIComponent(socname)}&accid=${encodeURIComponent(accId)}&paymentid=${paymentId}&sum=${sum}&currency=${currency}`
         );
         let checkRes = await Requests.checkResponse(resp);
         if (checkRes.success)

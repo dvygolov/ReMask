@@ -11,17 +11,19 @@ $serializer = new FbAccountSerializer(ACCOUNTSFILENAME);
 $acc = $serializer->getAccountByName($_GET['acc_name']);
 if ($acc == null) die("No account with name " . $_GET['acc_name'] . " found!");
 
-$paymentId = $this->getPaymentMethodIdAsync($_POST['account_id']);
+$accId = $_POST['accid'];
+$paymentId = $_POST['paymentid'];
+$sum = $_POST['sum'];
 $currency = $_POST['currency'];
 
 $ijson = array();
 $input = array();
 $input['client_mutation_id'] = "1";
 $input['actor_id'] = $acc->userId;
-$input['billable_account_payment_legacy_account_id'] = $_POST['account_id'];
+$input['billable_account_payment_legacy_account_id'] = $accId;
 $input['credential_id'] = $paymentId;
 $paymentAmount = array();
-$paymentAmount['amount'] = str_replace(',', '.', $_POST['sum']);
+$paymentAmount['amount'] = str_replace(',', '.', $sum);
 $paymentAmount['currency'] = $currency;
 $input['payment_amount'] = $paymentAmount;
 $ijson['input'] = $input;

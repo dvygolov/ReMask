@@ -11,7 +11,8 @@ export class AdAccount {
         this.billing = MathHelpers.mathMoney(accountData.adspaymentcycle?.data?.[0]?.threshold_amount ?? 0);
         this.curspend = MathHelpers.mathStat(accountData.current_unbilled_spend?.amount ?? 0);
         this.totalspend = MathHelpers.mathMoney(accountData.amount_spent ?? 0);
-        this.cardinfo = accountData.funding_source_details?.display_string ?? "";
+        this.paymentinfo = accountData.funding_source_details?.display_string ?? "";
+        this.paymentid = accountData.funding_source_details?.id??0;
         this.currency = accountData.currency;
         this.timezone = accountData.timezone_name;
         this.status = accountData.account_status;

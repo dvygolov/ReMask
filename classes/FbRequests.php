@@ -141,7 +141,7 @@ class FbRequests
         return null;
     }
 
-    private function GetLocationHeader($headers): ?string
+    private function GetLocationHeader(string $headers): ?string
     {
         preg_match("/location: (.*?)\n/", $headers, $matches);
         $header = isset($matches[1]) ? trim($matches[1]) : null;

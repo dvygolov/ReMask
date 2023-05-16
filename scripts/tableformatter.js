@@ -60,7 +60,7 @@ export class TableFormatter {
         const popupInfo = `
             ID: ${acc.id}<br>
             Pixel: ${acc.pixelid}<br> 
-            Card: ${acc.cardinfo}<br/> 
+            Card: ${acc.paymentinfo}<br/> 
             Currency: ${acc.currency}<br/> 
             Total spend: ${acc.totalspend}<br/>
             Time zone: ${acc.timezone}<br/>
@@ -94,8 +94,8 @@ export class TableFormatter {
         const esColor = this.getAdStatusColor(ad.status);
         const rank = `<span title="Engagement">${ranking[ad.engagementScore]}</span>|<span title="Conversion">${ranking[ad.conversionScore]}</span>|<span title="Quality">${ranking[ad.qualityScore]}</span>`;
         let status = ad.status;
-        if (ad.reviewFeedback) status+=`<br/>${ad.reviewFeedback}`;
-        if (ad.qualityScore && ad.qualityScore!=="UNKNOWN") status +=`<br/>${rank}`;
+        if (ad.reviewFeedback) status += `<br/>${ad.reviewFeedback}`;
+        if (ad.qualityScore && ad.qualityScore !== "UNKNOWN") status += `<br/>${rank}`;
         const tdArray = [
             imageCell,
             `<nobr>${name}</nobr>`,
@@ -124,8 +124,8 @@ export class TableFormatter {
         let actions = "";
         if (acc.status == 2 && acc.disable_reason == 1) // DISABLED ADS_INTEGRITY_POLICY
             actions += `<i class="fas fa-paper-plane sendappeal" title="Send appeal" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
-        else if (acc.status == 3) //UNSETTLED
-            actions += `<i class="fas fa-money-bill payunsettled" title="Pay UNSETTLED" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
+        else if (acc.status == 3 && acc.paymentinfo) //UNSETTLED + has card
+            actions += `<i class="fas fa-money-bill payunsettled" title="Pay UNSETTLED" data-socname="${acc.socname}" data-accid="${acc.id}" data-paymentid="${acc.paymentid}" data-currecy="${acc.currency}"></i> `;
         if (acc.rules.length > 0) {
             actions += `<span title="${acc.rules.map(rule => rule.name).join('\n')}">${acc.rules.length}</span> <i class="fas fa-download downrules" title="Download autorules" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
             actions += `<i class="fas fa-trash-can delrules" title="Delete autorules" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
@@ -209,10 +209,12 @@ export class TableFormatter {
             button.addEventListener('click', async (event) => {
                 const socname = event.target.dataset.socname;
                 const accId = event.target.dataset.accid;
+                const paymentId = event.target.dataset.accid;
+                const currency = event.target.dataset.currency;
                 const originalClassNames = event.target.className;
                 event.target.className = ' fas fa-spinner fa-spin';
                 event.target.disabled = true;
-                await Actions.payUnsettled(socname, accId);
+                await Actions.payUnsettled(socname, accId, paymentId, currency);
                 event.target.className = originalClassNames;
                 event.target.disabled = false;
             });
