@@ -132,12 +132,6 @@ select, option {
     -webkit-box-shadow: 0 5px 5px rgba(0,0,0,0.3);
     box-shadow: 0 5px 5px rgba(0,0,0,0.3);
 }
-.poster:hover .descr{
-    display:block;
-    position:absolute;
-    z-index:9999;
-    width: auto;
-}
 
 .centertable{
 	table-layout:fixed;

@@ -60,5 +60,8 @@ $accounts = $serializer->deserialize();
 <script src="scripts/index.js" type="module"></script>
 <div id='message'></div>
 <?= include 'copyright.php' ?>
+
+<script>
+</script>
 </body>
 </html>

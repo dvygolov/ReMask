@@ -61,8 +61,7 @@ export class TableFormatter {
             ID: ${acc.id}<br>
             Pixel: ${acc.pixelid}<br> 
             Card: ${acc.paymentinfo}<br/> 
-            Currency: ${acc.currency}<br/> 
-            Total spend: ${acc.totalspend}<br/>
+            Total spend: ${acc.totalspend} ${acc.currency}<br/>
             Time zone: ${acc.timezone}<br/>
             Created: ${acc.createdtime}`;
         let actions = this.getAccActions(acc);
