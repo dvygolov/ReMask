@@ -16,8 +16,9 @@ $acc = $serializer->getAccountByName($_POST['acc_name']);
 $req = new FbRequests();
 $accId = $_POST['accid'];
 $adId = $_POST['adid'];
+$dtsg = $req->GetDtsg($acc);
 $url = "https://www.facebook.com/ads/integrity/appeals_case/creation/ajax/";
-$body = "ad_account_id=$accId&adgroup_ids[0]=$adId";
+$body = "__a=1&fb_dtsg=$dtsg&ad_account_id=$accId&adgroup_ids[0]=$adId";
 $res = $req->PrivateApiPost($acc, $body, $url);
 
 ResponseFormatter::Respond($res);
