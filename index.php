@@ -2,6 +2,9 @@
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
+if (version_compare(phpversion(), '8.2.0', '<')) {
+    die("PHP version should be 8.2 or higher! Change your PHP version and return.");
+}
 require_once __DIR__ . '/checkpassword.php';
 require_once __DIR__ . '/classes/FbAccountSerializer.php';
 require_once __DIR__ . '/classes/FbAccount.php';
