@@ -8,8 +8,9 @@ require_once __DIR__ . '/../classes/FbRequests.php';
 require_once __DIR__ . '/../classes/ResponseFormatter.php';
 
 $serializer = new FbAccountSerializer(ACCOUNTSFILENAME);
-$acc = $serializer->getAccountByName($_GET['acc_name']);
-if ($acc == null) die("No account with name " . $_GET['acc_name'] . " found!");
+$accName = $_POST['acc_name'];
+$acc = $serializer->getAccountByName($accName);
+if ($acc == null) die("No account with name $accName found!");
 
 $accId = $_POST['accid'];
 $paymentId = $_POST['paymentid'];
@@ -26,10 +27,11 @@ $paymentAmount = array();
 $paymentAmount['amount'] = str_replace(',', '.', $sum);
 $paymentAmount['currency'] = $currency;
 $input['payment_amount'] = $paymentAmount;
+$input['transaction_initiation_source'] = "CUSTOMER";
 $ijson['input'] = $input;
 $vars = json_encode($ijson);
 
 $req = new FbRequests();
-$resp = $req->PrivateApiPost($acc, "doc_id=2367718093263338&variables=$vars");
+$resp = $req->PrivateApiPost($acc, "__a=1&doc_id=5553047091425712&variables=$vars","https://adsmanager.secure.facebook.com/ajax/payment/token_proxy.php?tpe=%2Fapi%2Fgraphql%2F&");
 
 ResponseFormatter::Respond($resp);

@@ -18,9 +18,9 @@ export class Requests {
         });
     }
 
-    static async checkResponse(resp, getBody=true) {
+    static async checkResponse(resp, getBody = true) {
         if (resp.status === 200) {
-            if (!getBody) return {success:true};
+            if (!getBody) return {success: true};
             let t = await resp.text();
             let json;
             try {
@@ -31,6 +31,8 @@ export class Requests {
             if (json.error) {
                 if (typeof json.error === 'object')
                     json.error = JSON.stringify(json.error);
+                else if (Number.isInteger(json.error) && json.errorDescription && json.errorSummary)
+                    json.error = `${json.errorSummary}: ${json.errorDescription}`;
                 return {success: false, error: json.error};
             }
             return {success: true, data: json};

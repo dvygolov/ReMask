@@ -123,8 +123,8 @@ export class TableFormatter {
         let actions = "";
         if (acc.status == 2 && acc.disable_reason == 1) // DISABLED ADS_INTEGRITY_POLICY
             actions += `<i class="fas fa-paper-plane sendappeal" title="Send appeal" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
-        else if (acc.status == 3 && acc.paymentinfo) //UNSETTLED + has card
-            actions += `<i class="fas fa-money-bill payunsettled" title="Pay UNSETTLED" data-socname="${acc.socname}" data-accid="${acc.id}" data-paymentid="${acc.paymentid}" data-currecy="${acc.currency}"></i> `;
+        else if ((acc.status == 3 || acc.status==1) && acc.paymentinfo) //UNSETTLED or ACTIVE + has card
+            actions += `<i class="fas fa-money-bill payunsettled" title="Make payment" data-socname="${acc.socname}" data-accid="${acc.id}" data-paymentid="${acc.paymentid}" data-currency="${acc.currency}"></i> `;
         if (acc.rules.length > 0) {
             actions += `<span title="${acc.rules.map(rule => rule.name).join('\n')}">${acc.rules.length}</span> <i class="fas fa-download downrules" title="Download autorules" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
             actions += `<i class="fas fa-trash-can delrules" title="Delete autorules" data-socname="${acc.socname}" data-accid="${acc.id}"></i> `;
@@ -208,7 +208,7 @@ export class TableFormatter {
             button.addEventListener('click', async (event) => {
                 const socname = event.target.dataset.socname;
                 const accId = event.target.dataset.accid;
-                const paymentId = event.target.dataset.accid;
+                const paymentId = event.target.dataset.paymentid;
                 const currency = event.target.dataset.currency;
                 const originalClassNames = event.target.className;
                 event.target.className = ' fas fa-spinner fa-spin';

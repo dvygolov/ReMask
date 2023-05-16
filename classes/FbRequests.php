@@ -78,7 +78,9 @@ class FbRequests
 
         $acc->proxy?->AddToCurlOptions($optArray);
 
-        return $this->Execute($acc, $optArray);
+        $res =  $this->Execute($acc, $optArray);
+        $res['res'] = str_replace("for (;;);", "", $res['res']);
+        return $res;
     }
 
     public function GetDtsg(FbAccount $acc): ?string
