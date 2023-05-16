@@ -32,6 +32,7 @@ $ijson['input'] = $input;
 $vars = json_encode($ijson);
 
 $req = new FbRequests();
-$resp = $req->PrivateApiPost($acc, "__a=1&doc_id=5553047091425712&variables=$vars","https://adsmanager.secure.facebook.com/ajax/payment/token_proxy.php?tpe=%2Fapi%2Fgraphql%2F&");
+$dtsg = $req->GetDtsg($acc);
+$resp = $req->PrivateApiPost($acc, "fb_dtsg=$dtsg&__a=1&doc_id=5553047091425712&variables=$vars","https://adsmanager.secure.facebook.com/ajax/payment/token_proxy.php?tpe=%2Fapi%2Fgraphql%2F&");
 
 ResponseFormatter::Respond($resp);
