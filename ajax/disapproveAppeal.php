@@ -20,4 +20,4 @@ $url = "https://www.facebook.com/ads/integrity/appeals_case/creation/ajax/";
 $body = "ad_account_id=$accId&adgroup_ids[0]=$adId";
 $res = $req->PrivateApiPost($acc, $body, $url);
 
-ResponseFormatter::Respond($resp);
+ResponseFormatter::Respond($res);
