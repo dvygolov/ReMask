@@ -1,4 +1,6 @@
 # ReMask
+![Accounts Editor](accounts.jpg)
+![Statistics](statistics.jpg)
 Lightweight tool to check statistics of multiple Facebook ad accounts at once.
 Can show stats for:
 - single account or all accounts
@@ -26,7 +28,7 @@ The following Actions are allowed:
 - Pay UNSETTLED accounts
 
 # Requirements
-PHP 8.0 or newer
+PHP 8.2 or newer
 # Installation
 Copy-Paste all the files, open settings.php and edit your password there. 
 
