@@ -74,8 +74,6 @@ class FbRequests
             CURLOPT_HTTPHEADER => $headers,
         );
 
-        $acc->proxy?->AddToCurlOptions($optArray);
-
         $res =  $this->Execute($acc, $optArray);
         $res['res'] = str_replace("for (;;);", "", $res['res']);
         return $res;

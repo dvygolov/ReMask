@@ -138,7 +138,7 @@ export class TableFormatter {
         if (acc.status == 2) return ''; //When acc DISABLED = no actions for ads
         switch (ad.status) {
             case 'DISAPPROVED':
-                return `<i class="fas fa-paper-plane senddisapprove" title="Send appeal" data-socname="${acc.socname}" data-adid="${ad.id}"></i>`;
+                return `<i class="fas fa-paper-plane senddisapprove" title="Send appeal" data-socname="${acc.socname}" data-accid="${acc.id}" data-adid="${ad.id}"></i>`;
                 break;
             case 'PAUSED':
                 return `<i class="fas fa-play startad" title="Start ad" data-socname="${acc.socname}" data-adid="${ad.id}"></i>`;
@@ -268,11 +268,12 @@ export class TableFormatter {
             button.addEventListener('click', async (event) => {
                 const socname = event.target.dataset.socname;
                 const adId = event.target.dataset.adid;
+                const accId = event.target.dataset.accid;
 
                 const originalClassNames = event.target.className;
                 event.target.className = ' fas fa-spinner fa-spin';
                 event.target.disabled = true;
-                await Actions.sendAdAppeal(socname, adId);
+                await Actions.sendAdAppeal(socname, accId, adId);
                 event.target.className = originalClassNames;
                 event.target.disabled = false;
             });

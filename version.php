@@ -1,2 +1,2 @@
 <?php
-echo "ReMask Panel ver.160523-2";
+echo "ReMask Panel ver.170523";

@@ -1,10 +1,10 @@
 import {Requests} from "./requests.js";
 
 export class Actions {
-    static async sendAdAppeal(socname, adId) {
+    static async sendAdAppeal(socname, accId, adId) {
         const resp = await Requests.post(
             "ajax/disapproveAppeal.php",
-            `acc_name=${encodeURIComponent(socname)}&adid=${encodeURIComponent(adId)}`
+            `acc_name=${encodeURIComponent(socname)}&accid=${encodeURIComponent(accId)}&adid=${encodeURIComponent(adId)}`
         );
         let checkRes = await Requests.checkResponse(resp);
         if (checkRes.success)
@@ -90,7 +90,7 @@ export class Actions {
     }
 
     static async deleteRules(socname, accId) {
-        let rules = window.adAcounts.filter(acc=>acc.id==accId)[0].rules.map(r=>r.id).join(',');
+        let rules = window.adAcounts.filter(acc => acc.id == accId)[0].rules.map(r => r.id).join(',');
         const resp = await Requests.post(
             "ajax/delRules.php",
             `acc_name=${encodeURIComponent(socname)}&rules=${encodeURIComponent(rules)}`
@@ -101,6 +101,7 @@ export class Actions {
         else
             alert(`Error deleting rules: ${checkRes.error}`);
     }
+
     static async uploadRules(socname, accId) {
         const fileInput = document.createElement("input");
         fileInput.type = "file";
