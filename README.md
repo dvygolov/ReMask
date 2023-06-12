@@ -30,7 +30,7 @@ The following Actions are allowed:
 # Requirements
 PHP 8.2 or newer
 # Installation
-Copy-Paste all the files, open settings.php and edit your password there. 
+Copy-Paste all the files to the ROOT folder of your domain, open settings.php and edit your password there. 
 
 Then go to http://yourdomain.com?password=yourpassword and enjoy!
 ## Donate 
